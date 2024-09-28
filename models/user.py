@@ -2,6 +2,9 @@
 from models import db
 from models.base_model import BaseModel
 from models.user_profile import UserProfile
+from models.article import Article
+from models.project import Project
+from models.work import Work
 from hashlib import md5
 import typing as t
 
@@ -14,11 +17,33 @@ class User(BaseModel, db.Model):
     name = db.Column(db.String(128), nullable=False)
     email = db.Column(db.String(128), nullable=False, unique=True)
     password = db.Column(db.String(60))
+    articles = db.relationship(
+        'Article',
+        backref='user',
+        cascade='all, delete-orphan',
+        lazy='dynamic'
+    )
+
+    projects = db.relationship(
+        'Project',
+        backref='user',
+        cascade='all, delete-orphan',
+        lazy='dynamic'
+    )
+
+    works = db.relationship(
+        'Work',
+        backref='user',
+        cascade='all, delete-orphan',
+        lazy='dynamic'
+    )
+
     profile = db.relationship(
         'UserProfile',
         backref='user',
         uselist=False,
-        cascade='delete'
+        cascade='all, delete-orphan',
+        lazy='dynamic'
     )
 
     def __init__(self, **kwargs: t.Mapping) -> None:
