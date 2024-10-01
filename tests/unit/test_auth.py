@@ -14,7 +14,7 @@ if project_root not in sys.path:
 
 import unittest
 from hashlib import md5
-from api.v1.auth.auth import Auth
+from app.v1.auth.auth import Auth
 from unittest.mock import (
     patch,
     MagicMock
@@ -35,7 +35,7 @@ class TestAuth(unittest.TestCase):
         password = md5(cls.test_password.encode('utf-8')).hexdigest()
         cls.mock_user = MagicMock(email=cls.test_email, password=password)
 
-    @patch('models.db.fetch_object_by')
+    @patch('models.db.fetch_an_object_by')
     def test_authenticate_user_success(self, mock_fetch: MagicMock) -> None:
         """
         Test the method that authenticate user for valid input
@@ -46,7 +46,7 @@ class TestAuth(unittest.TestCase):
 
         self.assertEqual(user, self.mock_user)
 
-    @patch('models.db.fetch_object_by')
+    @patch('models.db.fetch_an_object_by')
     def test_authenticate_user_incorrect_password(
         self,
         mock_fetch: MagicMock
@@ -61,7 +61,7 @@ class TestAuth(unittest.TestCase):
 
         self.assertIsNone(user)
 
-    @patch('models.db.fetch_object_by')
+    @patch('models.db.fetch_an_object_by')
     def test_authenticate_user_unregistered_email(
         self,
         mock_fetch: MagicMock
@@ -78,7 +78,7 @@ class TestAuth(unittest.TestCase):
 
         self.assertEqual(str(ctx.exception), 'email not registered')
 
-    @patch('models.db.fetch_object_by')
+    @patch('models.db.fetch_an_object_by')
     @patch('models.db.add_object')
     def test_register_user_success(
         self,
@@ -99,7 +99,7 @@ class TestAuth(unittest.TestCase):
 
         self.assertEqual(user, self.mock_user)
 
-    @patch('models.db.fetch_object_by')
+    @patch('models.db.fetch_an_object_by')
     @patch('models.db.add_object')
     def test_register_user_registered_email(
         self,
@@ -113,7 +113,7 @@ class TestAuth(unittest.TestCase):
         mock_add.return_value = None
 
         with self.assertRaises(ValueError) as ctx:
-            user = self.auth.register_user(
+            _ = self.auth.register_user(
                 self.test_name,
                 self.test_email,
                 self.test_password

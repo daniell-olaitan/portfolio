@@ -1,18 +1,14 @@
 #!/usr/bin/python3
 import requests
-import typing as t
 from models import db
-from api.v1.auth import auth
+from app.v1.auth import auth
 from models.user import User
 from secrets import token_urlsafe
 from urllib.parse import urlencode
 from models.invalid_token import InvalidToken
 from flask.typing import ResponseReturnValue
-from api.v1.auth.auth import Auth
-from api import (
-    jwt,
-    google_document_cfg
-)
+from app.v1.auth.auth import Auth
+from app import google_document_cfg
 from flask import (
     request,
     jsonify,
@@ -28,57 +24,6 @@ from flask_jwt_extended import (
 )
 
 user_auth = Auth()
-
-
-@jwt.token_in_blocklist_loader
-def check_if_token_is_blacklisted(
-    jwt_header: t.Mapping[str, str],
-    jwt_payload: t.Mapping[str, str]
-) -> bool:
-    """
-    Check if user has logged out
-    """
-    jti = jwt_payload['jti']
-    return InvalidToken.verify_jti(jti)
-
-
-@jwt.expired_token_loader
-def expired_token_callback(
-    jwt_header: t.Mapping[str, str],
-    jwt_payload: t.Mapping[str, str]
-) -> ResponseReturnValue:
-    """
-    Check if access_token has expired
-    """
-    return jsonify({
-        'status': 'fail',
-        'data': {'token': 'token has expired'},
-    }), 401
-
-
-@jwt.revoked_token_loader
-def revoked_token_callback(
-    jwt_header: t.Mapping[str, str],
-    jwt_payload: t.Mapping[str, str]
-) -> ResponseReturnValue:
-    """
-    Check if access_token has been revoked
-    """
-    return jsonify({
-        'status': 'fail',
-        'data': {'token': 'token has been revoked'},
-    }), 401
-
-
-@jwt.unauthorized_loader
-def unauthorized_callback(_) -> ResponseReturnValue:
-    """
-    Handle unauthorized access
-    """
-    return jsonify({
-        'status': 'fail',
-        'data': {'token': 'missing access token'},
-    }), 401
 
 
 @auth.route('/register', methods=['POST'])
@@ -111,16 +56,16 @@ def register_user() -> ResponseReturnValue:
                 'status': 'success',
                 'data': user.to_json()
             }), 201
-        except ValueError as e:
+        except ValueError as err:
             return jsonify({
                 'status': 'fail',
-                'data': {'email': str(e)}
+                'data': {'error': str(err)}
             }), 400
-    except Exception:
+    except Exception as err:
         return jsonify({
             'status': 'fail',
             'data': {
-                'user_details': 'invalid user details'
+                'error': f"wrong format: {err}"
             }
         }), 400
 
@@ -160,18 +105,18 @@ def login() -> ResponseReturnValue:
 
             return jsonify({
                 'status': 'fail',
-                'data': {'password': 'password is incorrect'}
+                'data': {'error': 'password is incorrect'}
             }), 400
-        except ValueError as e:
+        except ValueError as err:
             return jsonify({
                 'status': 'fail',
-                'data': {'email': str(e)}
+                'data': {'error': str(err)}
             }), 400
-    except:
+    except Exception as err:
         return jsonify({
             'status': 'fail',
             'data': {
-                'user_details': 'invalid user details'
+                'error': f"wrong format: {err}"
             }
         }), 400
 
@@ -283,5 +228,5 @@ def logout() -> ResponseReturnValue:
 
     return jsonify({
         'status': 'success',
-        'data': None
+        'data': {}
     }), 200

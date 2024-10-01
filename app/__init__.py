@@ -19,11 +19,13 @@ def create_app(config_type: str) -> Flask:
     app = Flask(__name__)
     app.url_map.strict_slashes = False
     app.config.from_object(config[config_type])
-    from api.v1.auth import auth
+    from app.v1.auth import auth
+    from app.v1.app_views import app_views
 
     app.register_blueprint(auth)
+    app.register_blueprint(app_views)
     CORS(app, resources={
-        r'/api/*': {
+        r'/v1*': {
             'origins': '*'
         }
     })

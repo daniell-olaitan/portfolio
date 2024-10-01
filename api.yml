@@ -1,0 +1,225 @@
+openapi: 3.0.3
+info:
+  version: 1.0.0
+  title: portfolio API
+  description: A simple API to provide backend functionality for user portfolio
+  contact:
+    name: Daniel OLAITAN
+    url: https://github.com/daniell-olaitan
+    email: daniell.olaitan@gmail.com
+servers:
+  - url: /v1
+paths:
+  /auth/register:
+    post:
+      operationId: api.v1.auth.views.register_user
+      tags:
+        - Auth
+      summary: Register a new user
+      description: Register a new user
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                name:
+                  type: string
+                email:
+                  type: string
+                password:
+                  type: string
+              required:
+                - name
+                - email
+                - password
+      responses:
+        201:
+          description: success
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/User"
+        400:
+          $ref: '#/components/responses/400Error'
+        422:
+          $ref: '#/components/responses/422Error'
+
+  /auth/login:
+    post:
+      operationId: api.v1.auth.views.login
+      tags:
+        - Auth
+      summary: Login a user
+      description: Login a user
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                email:
+                  type: string
+                password:
+                  type: string
+              required:
+                - email
+                - password
+      responses:
+        200:
+          description: success
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/LoggedInUser"
+        400:
+          $ref: '#/components/responses/400Error'
+        422:
+          $ref: '#/components/responses/422Error'
+  /auth/google-login:
+    get:
+      operationId: api.v1.auth.views.google_register
+      tags:
+        - Auth
+      summary: Register or login a user through google login
+      description: Register or login a user through google login
+      responses:
+        200:
+          description: success
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/LoggedInUser"
+        400:
+          $ref: '#/components/responses/400Error'
+        500:
+          $ref: '#/components/responses/500Error'
+  /auth/logout:
+    get:
+      operationId: api.v1.auth.views.logout
+      tags:
+        - Auth
+      summary: Log out user
+      description: Log out user
+      security:
+        - BearerAuth: []
+      responses:
+        200:
+          description: success
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                    example: success
+                  data:
+                    nullable: true
+                    example: null
+components:
+  securitySchemes:
+    BearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+  schemas:
+    User:
+      type: object
+      properties:
+        status:
+          type: string
+          example: success
+        data:
+          type: object
+          properties:
+            name:
+              type: string
+            email:
+              type: string
+            id:
+              type: string
+            created_at:
+              type: string
+            updated_at:
+              type: string
+    LoggedInUser:
+      type: object
+      properties:
+        status:
+          type: string
+          example: success
+        data:
+          type: object
+          properties:
+            access_token:
+              type: string
+            user:
+              type: object
+              properties:
+                name:
+                  type: string
+                email:
+                  type: string
+                id:
+                  type: string
+                created_at:
+                  type: string
+                updated_at:
+                  type: string
+    422Error:
+      type: object
+      properties:
+        status:
+          type: string
+          example: fail
+        data:
+          type: array
+          items:
+            type: object
+            properties:
+              '{field}':
+                type: string
+                example: '{field} is required'
+    400Err0r:
+      type: object
+      properties:
+        status:
+          type: string
+          example: fail
+        data:
+          type: object
+    500Err0r:
+      type: object
+      properties:
+        status:
+          type: string
+          example: error
+        message:
+          type: string
+  responses:
+    400Error:
+      description: Bad Request - The `data` key is an object where each key is a field/variable that led to the error, and the value is the description of the error.
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/400Err0r'
+    422Error:
+      description: |
+            Validation Error - The `data` key is an array of objects where each object represents a validation error.
+            The key in each object corresponds to the field that caused the error, and the value is a description of the error.
+            Example:
+            - `"email"`: `"email is required"`
+            - `"password"`: `"password is required"`
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/422Error'
+    500Error:
+      description: Internal Server error
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/500Err0r'

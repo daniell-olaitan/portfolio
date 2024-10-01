@@ -13,58 +13,13 @@ if project_root not in sys.path:
     sys.path.append(project_root)
 
 import unittest
-import typing as t
-from parameterized import parameterized
-from models import db
-from api import create_app
+from tests.integration.base_test import BaseTestCase
 
 
-class TestAuthRoutes(unittest.TestCase):
+class TestAuthRoutes(BaseTestCase):
     """
-    Test all the routes in the application
+    Test all the authentication routes
     """
-
-    @classmethod
-    def setUpClass(cls) -> None:
-        """
-        Set up default values before the test
-        """
-        cls.app = create_app('testing')
-        cls.app_context = cls.app.app_context()
-        cls.test_client = cls.app.test_client()
-        cls.test_name = 'testname'
-        cls.test_email = 'testemail@email.com'
-        cls.test_pwd = 'testpwd'
-        cls.url = '/api/v1/auth'
-        cls.details = {
-            'name': cls.test_name,
-            'email': cls.test_email,
-            'password': cls.test_pwd
-        }
-
-        cls.login = {
-            'email': cls.test_email,
-            'password': cls.test_pwd
-        }
-
-    def setUp(self) -> None:
-        """
-        Set the app context and create the database
-        """
-        self.app_context.push()
-        db.create_all()
-        self.resp = self.test_client.post(
-            self.url + '/register',
-            json=self.details
-        )
-
-    def tearDown(self) -> None:
-        """
-        Remove the app context and the database
-        """
-        db.session.remove()
-        db.drop_all()
-        self.app_context.pop()
 
     def test_register_user_success(self) -> None:
         """
@@ -88,7 +43,7 @@ class TestAuthRoutes(unittest.TestCase):
         }
 
         resp = self.test_client.post(
-            self.url + '/register',
+            self.url + '/auth/register',
             json={
                 'name': '',
                 'email': '',
@@ -106,12 +61,12 @@ class TestAuthRoutes(unittest.TestCase):
         error = {
             'status': 'fail',
             'data': {
-                'email': f"User {self.test_email} already exists"
+                'error': f"User {self.test_email} already exists"
             }
         }
 
         resp = self.test_client.post(
-            self.url + '/register',
+            self.url + '/auth/register',
             json=self.details
         )
 
@@ -122,15 +77,8 @@ class TestAuthRoutes(unittest.TestCase):
         """
         Test the register user route with invalid details
         """
-        error = {
-            'status': 'fail',
-            'data': {
-                'user_details': 'invalid user details'
-            }
-        }
-
         resp = self.test_client.post(
-            self.url + '/register',
+            self.url + '/auth/register',
             json={
                 'name': self.test_name,
                 'email': ''
@@ -138,14 +86,14 @@ class TestAuthRoutes(unittest.TestCase):
         )
 
         self.assertEqual(resp.status_code, 400)
-        self.assertEqual(resp.get_json(), error)
+        self.assertIn('wrong format:', resp.get_json()['data']['error'])
 
     def test_login_success(self):
         """
         Test the method that logs the user in
         """
         resp = self.test_client.post(
-            self.url + '/login',
+            self.url + '/auth/login',
             json=self.login
         )
 
@@ -164,7 +112,7 @@ class TestAuthRoutes(unittest.TestCase):
         }
 
         resp = self.test_client.post(
-            self.url + '/login',
+            self.url + '/auth/login',
             json={
                 'email': '',
                 'password': self.test_pwd
@@ -181,12 +129,12 @@ class TestAuthRoutes(unittest.TestCase):
         error = {
             'status': 'fail',
             'data': {
-                'password': 'password is incorrect'
+                'error': 'password is incorrect'
             }
         }
 
         resp = self.test_client.post(
-            self.url + '/login',
+            self.url + '/auth/login',
             json={
                 'email': self.test_email,
                 'password': 'wrongpassword'
@@ -203,12 +151,12 @@ class TestAuthRoutes(unittest.TestCase):
         error = {
             'status': 'fail',
             'data': {
-                'email': 'email not registered'
+                'error': 'email not registered'
             }
         }
 
         resp = self.test_client.post(
-            self.url + '/login',
+            self.url + '/auth/login',
             json={
                 'email': 'unregistered_email',
                 'password': self.test_pwd
@@ -222,28 +170,21 @@ class TestAuthRoutes(unittest.TestCase):
         """
         Test login method with invalid details
         """
-        error = {
-            'status': 'fail',
-            'data': {
-                'user_details': 'invalid user details'
-            }
-        }
-
         resp = self.test_client.post(
-            self.url + '/login',
+            self.url + '/auth/login',
             json={
                 'password': self.test_pwd
             }
         )
 
         self.assertEqual(resp.status_code, 400)
-        self.assertEqual(resp.get_json(), error)
+        self.assertIn('wrong format:', resp.get_json()['data']['error'])
 
     def test_logout(self) -> None:
         """
         Test the log out route
         """
-        resp = self.test_client.get(self.url + '/logout')
+        resp = self.test_client.get(self.url + '/auth/logout')
 
         self.assertEqual(resp.status_code, 401)
         self.assertEqual(resp.get_json(), {
@@ -252,7 +193,7 @@ class TestAuthRoutes(unittest.TestCase):
         })
 
         resp = self.test_client.post(
-            self.url + '/login',
+            self.url + '/auth/login',
             json=self.login
         )
 
@@ -262,15 +203,15 @@ class TestAuthRoutes(unittest.TestCase):
             'Authorization': f"Bearer {access_token}"
         }
 
-        resp = self.test_client.get(self.url + '/logout', headers=headers)
+        resp = self.test_client.get(self.url + '/auth/logout', headers=headers)
 
         self.assertEqual(resp.status_code, 200)
         self.assertEqual(resp.get_json(), {
             'status': 'success',
-            'data': None
+            'data': {}
         })
 
-        resp = self.test_client.get(self.url + '/logout', headers=headers)
+        resp = self.test_client.get(self.url + '/auth/logout', headers=headers)
 
         self.assertEqual(resp.status_code, 401)
         self.assertEqual(resp.get_json(), {

@@ -35,7 +35,7 @@ class TestDBStrorage(unittest.TestCase):
         self.mock_session = MagicMock()
         self.db.session = self.mock_session
 
-    def test_add_boject(self):
+    def test_add_object(self):
         """
         Test the save method
         """
@@ -62,7 +62,7 @@ class TestDBStrorage(unittest.TestCase):
         self.mock_session.delete.assert_called_once_with(mock_obj)
         self.mock_session.commit.assert_called_once()
 
-    def test_fetch_obj_by(self):
+    def test_fetch_an_object_by(self):
         """
         Test the fetch_obj_by method
         """
@@ -71,10 +71,10 @@ class TestDBStrorage(unittest.TestCase):
         mock_kwargs = {'name': 'test', 'value': 12}
         mock_query = self.mock_session.query.return_value
         mock_filter = mock_query.filter_by.return_value
-        mock_filter.all.return_value = mock_obj
+        mock_filter.first.return_value = mock_obj
 
 
-        obj = self.db.fetch_object_by(mock_class, **mock_kwargs)
+        obj = self.db.fetch_an_object_by(mock_class, **mock_kwargs)
 
         self.mock_session.query.assert_called_once_with(mock_class)
         mock_query.filter_by.assert_called_once_with(
@@ -82,6 +82,27 @@ class TestDBStrorage(unittest.TestCase):
         )
 
         self.assertEqual(obj, mock_obj)
+
+    def test_fetch_object_by(self):
+        """
+        Test the fetch_obj_by method
+        """
+        mock_class = MagicMock()
+        mock_objs = MagicMock()
+        mock_kwargs = {'name': 'test', 'value': 12}
+        mock_query = self.mock_session.query.return_value
+        mock_filter = mock_query.filter_by.return_value
+        mock_filter.all.return_value = mock_objs
+
+
+        objs = self.db.fetch_object_by(mock_class, **mock_kwargs)
+
+        self.mock_session.query.assert_called_once_with(mock_class)
+        mock_query.filter_by.assert_called_once_with(
+            **mock_kwargs
+        )
+
+        self.assertEqual(objs, mock_objs)
 
     def test_update_object_valid_key(self):
         """
@@ -94,13 +115,11 @@ class TestDBStrorage(unittest.TestCase):
         mock_table = MagicMock()
         mock_table.columns.keys.return_value = ['name', 'value']
         mock_obj.__table__ = mock_table
-        mock_query = self.mock_session.query.return_value
-        mock_query.get.return_value = mock_obj
+        self.mock_session.get.return_value = mock_obj
 
-        self.db.update_object(mock_id, mock_class, **mock_kwargs)
+        self.db.update_object(mock_class, mock_id, **mock_kwargs)
 
-        self.mock_session.query.assert_called_once_with(mock_class)
-        mock_query.get.assert_called_once_with(mock_id)
+        self.mock_session.get.assert_called_once_with(mock_class, mock_id)
 
         for key, value in mock_kwargs.items():
             self.assertEqual(getattr(mock_obj, key), value)
@@ -113,22 +132,24 @@ class TestDBStrorage(unittest.TestCase):
         Test the update_object method with invalid keys
         """
         mock_id = str(uuid.uuid4())
-        mock_class = MagicMock()
+        mock_class = MagicMock(__name__='Test')
         mock_kwargs = {'age': 12}
         mock_obj = MagicMock(id=mock_id)
         mock_table = MagicMock()
         mock_table.columns.keys.return_value = ['name', 'value']
         mock_obj.__table__ = mock_table
-        mock_query = self.mock_session.query.return_value
-        mock_query.get.return_value = mock_obj
+        self.mock_session.get.return_value = mock_obj
 
-        with self.assertRaises(ValueError):
-            self.db.update_object(mock_id, mock_class, **mock_kwargs)
+        with self.assertRaises(ValueError) as ctx:
+            self.db.update_object(mock_class, mock_id, **mock_kwargs)
 
-        self.mock_session.query.assert_called_once_with(mock_class)
-        mock_query.get.assert_called_once_with(mock_id)
+        self.mock_session.get.assert_called_once_with(mock_class, mock_id)
         self.mock_session.add.assert_not_called()
         self.mock_session.commit.assert_not_called()
+        self.assertEqual(
+            str(ctx.exception),
+            f"age field does not exist in Test Model"
+        )
 
 
 if __name__ == '__main__':

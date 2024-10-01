@@ -20,8 +20,7 @@ class Work(BaseModel, db.Model):
     end_date = db.Column(db.DateTime, nullable=False)
     skills = db.relationship(
         'Skill',
-        backref='project',
-        cascade='save-update, merge, delete-orphan',
+        backref='work',
         lazy='dynamic'
     )
 

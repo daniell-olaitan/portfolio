@@ -43,7 +43,6 @@ class User(BaseModel, db.Model):
         backref='user',
         uselist=False,
         cascade='all, delete-orphan',
-        lazy='dynamic'
     )
 
     def __init__(self, **kwargs: t.Mapping) -> None:

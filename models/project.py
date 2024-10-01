@@ -21,7 +21,6 @@ class Project(BaseModel, db.Model):
     skills = db.relationship(
         'Skill',
         backref='project',
-        cascade='save-update, merge, delete-orphan',
         lazy='dynamic'
     )
 
