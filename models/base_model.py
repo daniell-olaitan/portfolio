@@ -22,7 +22,10 @@ class BaseModel:
         obj = vars(self)
         obj['created_at'] = self.created_at.isoformat()
         obj['updated_at'] = self.updated_at.isoformat()
-        del obj['_sa_instance_state']
-        del obj['password']
+        if '_sa_instance_state' in obj:
+            del obj['_sa_instance_state']
+
+        if 'password' in obj:
+            del obj['password']
 
         return obj

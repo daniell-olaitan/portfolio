@@ -35,14 +35,16 @@ class TestDBStrorage(unittest.TestCase):
         self.mock_session = MagicMock()
         self.db.session = self.mock_session
 
-    def test_add_object(self):
+    def test_add_object_success(self):
         """
         Test the save method
         """
+        mock_table = MagicMock()
+        mock_table.columns.keys.return_value = ['test1', 'test2']
+        mock_class = MagicMock(__table__=mock_table)
         mock_obj = MagicMock()
-        mock_class = MagicMock()
         mock_class.return_value = mock_obj
-        mock_kwargs = {'name': 'test', 'value': 12}
+        mock_kwargs = {'test1': 'test', 'test2': 12}
 
         obj = self.db.add_object(mock_class, **mock_kwargs)
 
@@ -50,6 +52,28 @@ class TestDBStrorage(unittest.TestCase):
         mock_class.assert_called_once_with(**mock_kwargs)
         self.mock_session.add.assert_called_once_with(mock_obj)
         self.mock_session.commit.assert_called_once()
+
+    def test_add_object_failure(self):
+        """
+        Test the save method with wrong field
+        """
+        mock_table = MagicMock()
+        mock_table.columns.keys.return_value = ['test1', 'test2']
+        mock_class = MagicMock(__table__=mock_table, __name__='Test')
+        mock_obj = MagicMock()
+        mock_class.return_value = mock_obj
+        mock_kwargs = {'test1': 'test', 'test3': 12}
+
+        with self.assertRaises(ValueError) as ctx:
+            _ = self.db.add_object(mock_class, **mock_kwargs)
+
+        self.mock_session.add.assert_not_called()
+        self.mock_session.commit.assert_not_called()
+        self.mock_session.rollback.assert_not_called()
+        self.assertEqual(
+            str(ctx.exception),
+            f"test3 field does not exist in Test Model"
+        )
 
     def test_remove_object(self):
         """
@@ -61,6 +85,7 @@ class TestDBStrorage(unittest.TestCase):
 
         self.mock_session.delete.assert_called_once_with(mock_obj)
         self.mock_session.commit.assert_called_once()
+        self.mock_session.roolback.assert_not_called()
 
     def test_fetch_an_object_by(self):
         """
@@ -119,7 +144,7 @@ class TestDBStrorage(unittest.TestCase):
 
         self.db.update_object(mock_class, mock_id, **mock_kwargs)
 
-        self.mock_session.get.assert_called_once_with(mock_class, mock_id)
+        self.mock_session.get.assert_called_with(mock_class, mock_id)
 
         for key, value in mock_kwargs.items():
             self.assertEqual(getattr(mock_obj, key), value)
@@ -146,6 +171,7 @@ class TestDBStrorage(unittest.TestCase):
         self.mock_session.get.assert_called_once_with(mock_class, mock_id)
         self.mock_session.add.assert_not_called()
         self.mock_session.commit.assert_not_called()
+        self.mock_session.rollback.assert_not_called()
         self.assertEqual(
             str(ctx.exception),
             f"age field does not exist in Test Model"

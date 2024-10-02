@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 from flask_sqlalchemy import SQLAlchemy
 import typing as t
+from sqlalchemy.exc import IntegrityError
 
 ModelType = t.TypeVar('Model')
 
@@ -14,15 +15,29 @@ class DBStorage(SQLAlchemy):
         """
         Create and add new object to the db
         """
-        obj = cls(**kwargs)
-        self.session.add(obj)
-        self.session.commit()
+        for field in kwargs.keys():
+            if field not in cls.__table__.columns.keys():
+                raise ValueError(
+                    f"{field} field does not exist in {cls.__name__} Model"
+                )
+
+        try:
+            obj = cls(**kwargs)
+            self.session.add(obj)
+            self.session.commit()
+        except IntegrityError as err:
+            self.session.rollback()
+            raise ValueError(f"Database error: {err}")
 
         return obj
 
     def remove_object(self, obj: ModelType) -> None:
-        self.session.delete(obj)
-        self.session.commit()
+        try:
+            self.session.delete(obj)
+            self.session.commit()
+        except IntegrityError as err:
+            self.session.rollback()
+            raise ValueError(f"Database error: {err}")
 
     def fetch_an_object_by(
         self,
@@ -49,7 +64,7 @@ class DBStorage(SQLAlchemy):
         cls: t.Type[ModelType],
         id: str,
         **kwargs:t.Mapping
-    ) -> None:
+    ) -> ModelType:
         """
         Update a given model object
         """
@@ -62,5 +77,11 @@ class DBStorage(SQLAlchemy):
 
             setattr(obj, key, value)
 
-        self.session.add(obj)
-        self.session.commit()
+        try:
+            self.session.add(obj)
+            self.session.commit()
+
+            return self.session.get(cls, id)
+        except IntegrityError as err:
+            self.session.rollback()
+            raise ValueError(f"Database error: {err}")

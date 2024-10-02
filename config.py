@@ -11,7 +11,7 @@ class Config:
     JWT_BLACKLIST_TOKEN_CHECKS = ['access']
     GOOGLE_CLIENT_ID = getenv("GOOGLE_CLIENT_ID", None)
     GOOGLE_CLIENT_SECRET = getenv("GOOGLE_CLIENT_SECRET", None)
-    GOOGLE_REDIRECT_URI = 'https://127.0.0.1:5000/api/v1/auth/login-callback'
+    GOOGLE_REDIRECT_URI = 'https://127.0.0.1:5000/v1/auth/login-callback'
 
 
 class DevelopmentConfig(Config):

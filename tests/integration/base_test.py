@@ -22,8 +22,8 @@ class BaseTestCase(unittest.TestCase):
         cls.app_context = cls.app.app_context()
         cls.test_client = cls.app.test_client()
         cls.test_name = 'testname'
-        cls.test_email = 'testemail@email.com'
-        cls.test_pwd = 'testpwd'
+        cls.test_email = 'testemail'
+        cls.test_pwd = 'testpassword'
         cls.url = '/v1'
         cls.details = {
             'name': cls.test_name,
@@ -36,16 +36,55 @@ class BaseTestCase(unittest.TestCase):
             'password': cls.test_pwd
         }
 
+        cls.test_name_ = 'testname2'
+        cls.test_email_ = 'testemail2'
+        cls.test_pwd_ = 'testpassword2'
+        cls.details_ = {
+            'name': cls.test_name_,
+            'email': cls.test_email_,
+            'password': cls.test_pwd_
+        }
+
+        cls.login_ = {
+            'email': cls.test_email_,
+            'password': cls.test_pwd_
+        }
+
     def setUp(self) -> None:
         """
         Set the app context and create the database
         """
         self.app_context.push()
         self.db.create_all()
-        self.resp = self.test_client.post(
+        self.reg_resp = self.test_client.post(
             self.url + '/auth/register',
             json=self.details
         )
+
+        self.reg_resp_ = self.test_client.post(
+            self.url + '/auth/register',
+            json=self.details_
+        )
+
+        self.login_resp = self.test_client.post(
+            self.url + '/auth/login',
+            json=self.login
+        )
+
+        self.login_resp_ = self.test_client.post(
+            self.url + '/auth/login',
+            json=self.login_
+        )
+
+        self.access_token = self.login_resp.get_json()['data']['access_token']
+        self.auth_header = {
+            'Authorization': f"Bearer {self.access_token}"
+        }
+
+        self.access_token_ = self.login_resp_.get_json()['data']['access_token']
+        self.auth_header_ = {
+            'Authorization': f"Bearer {self.access_token_}"
+        }
 
     def tearDown(self) -> None:
         """

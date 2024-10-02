@@ -5,6 +5,7 @@ from models.user_profile import UserProfile
 from models.article import Article
 from models.project import Project
 from models.work import Work
+from models.contribution import Contribution
 from hashlib import md5
 import typing as t
 
@@ -33,6 +34,13 @@ class User(BaseModel, db.Model):
 
     works = db.relationship(
         'Work',
+        backref='user',
+        cascade='all, delete-orphan',
+        lazy='dynamic'
+    )
+
+    contributions = db.relationship(
+        'Contribution',
         backref='user',
         cascade='all, delete-orphan',
         lazy='dynamic'

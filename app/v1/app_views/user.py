@@ -17,14 +17,12 @@ from flask import (
 )
 
 
-@app_views.route('/users/me', methods=['GET'])
-@jwt_required()
-def get_user() -> ResponseReturnValue:
+@app_views.route('/users/<string:email>', methods=['GET'])
+def get_user(email: str) -> ResponseReturnValue:
     """
     Fetch the current user
     """
-    user_id = get_jwt_identity()
-    user = db.fetch_an_object_by(User, id=user_id)
+    user = db.fetch_an_object_by(User, email=email)
     if not user:
         abort(404)
 
@@ -54,10 +52,11 @@ def update_user(user_id: str) -> ResponseReturnValue:
     if not user:
         abort(404)
 
-    try:
-        db.update_object(User, user_id, **user_details)
-        user = db.fetch_an_object_by(User, id=user_id)
+    if user_id != get_jwt_identity():
+        abort(404)
 
+    try:
+        user = db.update_object(User, user_id, **user_details)
         return jsonify({
             'status': 'success',
             'data': user.to_json()
@@ -79,6 +78,9 @@ def delete_user(user_id: str) -> ResponseReturnValue:
     """
     user = db.fetch_an_object_by(User, id=user_id)
     if not user:
+        abort(404)
+
+    if user_id != get_jwt_identity():
         abort(404)
 
     db.remove_object(user)

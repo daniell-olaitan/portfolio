@@ -15,7 +15,7 @@ migrate = Migrate()
 google_document_cfg = get_provider_cfg()
 
 
-def create_app(config_type: str) -> Flask:
+def create_app(config_type: str = 'default') -> Flask:
     app = Flask(__name__)
     app.url_map.strict_slashes = False
     app.config.from_object(config[config_type])

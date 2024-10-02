@@ -25,9 +25,9 @@ class TestAuthRoutes(BaseTestCase):
         """
         Test register user route
         """
-        self.assertEqual(self.resp.status_code, 201)
+        self.assertEqual(self.reg_resp.status_code, 201)
         self.assertEqual(
-            self.resp.get_json().get('status'), 'success'
+            self.reg_resp.get_json().get('status'), 'success'
         )
 
     def test_register_user_validation_error(self) -> None:

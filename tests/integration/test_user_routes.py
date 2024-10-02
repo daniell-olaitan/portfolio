@@ -22,21 +22,9 @@ class TestUserRoutes(BaseTestCase):
     Class to test all the routes in user views
     """
 
-    def setUp(self) -> None:
-        super().setUp()
-        self.login_resp = self.test_client.post(
-            self.url + '/auth/login',
-            json=self.login
-        )
-
-        self.access_token = self.login_resp.get_json()['data']['access_token']
-        self.auth_header = {
-            'Authorization': f"Bearer {self.access_token}"
-        }
-
     def test_get_user_success(self) -> None:
         resp = self.test_client.get(
-            self.url + '/users/me',
+            self.url + f"/users/{self.test_email}",
             headers=self.auth_header
         )
 
@@ -44,12 +32,8 @@ class TestUserRoutes(BaseTestCase):
         self.assertEqual(resp.get_json()['status'], 'success')
 
     def test_get_user_failure(self) -> None:
-        id = self.resp.get_json()['data']['id']
-        user = self.db.fetch_an_object_by(User, id=id)
-        self.db.remove_object(user)
-
         resp = self.test_client.get(
-            self.url + '/users/me',
+            self.url + '/users/wrongemail',
             headers=self.auth_header
         )
 
@@ -63,7 +47,7 @@ class TestUserRoutes(BaseTestCase):
         }
 
         response = self.test_client.put(
-            self.url + f"/users/{self.resp.get_json()['data']['id']}",
+            self.url + f"/users/{self.reg_resp.get_json()['data']['id']}",
             headers=self.auth_header,
             json=data
         )
@@ -81,7 +65,7 @@ class TestUserRoutes(BaseTestCase):
         }
 
         response = self.test_client.put(
-            self.url + f"/users/{self.resp.get_json()['data']['id']}",
+            self.url + f"/users/{self.reg_resp.get_json()['data']['id']}",
             headers=self.auth_header,
             data=data
         )
@@ -100,7 +84,7 @@ class TestUserRoutes(BaseTestCase):
         }
 
         response = self.test_client.put(
-            self.url + f"/users/{self.resp.get_json()['data']['id']}",
+            self.url + f"/users/{self.reg_resp.get_json()['data']['id']}",
             headers=self.auth_header,
             json=data
         )
@@ -111,9 +95,39 @@ class TestUserRoutes(BaseTestCase):
             response.get_json()['data']['error']
         )
 
-    def test_delete_user(self) -> None:
+    def test_update_user_invalid_user(self) -> None:
+        data = {
+            'name': 'updatedname',
+            'password': 'updatedpassword',
+            'email': 'updatedemail'
+        }
+
+        response = self.test_client.put(
+            self.url + '/users/invalid_user_id',
+            headers=self.auth_header,
+            json=data
+        )
+
+        self.assertEqual(response.status_code, 404)
+
+    def test_update_user_wrong_user(self) -> None:
+        data = {
+            'name': 'updatedname',
+            'password': 'updatedpassword',
+            'email': 'updatedemail'
+        }
+
+        response = self.test_client.put(
+            self.url + f"/users/{self.reg_resp.get_json()['data']['id']}",
+            headers=self.auth_header_,
+            json=data
+        )
+
+        self.assertEqual(response.status_code, 404)
+
+    def test_delete_user_success(self) -> None:
         response = self.test_client.delete(
-            self.url + f"/users/{self.resp.get_json()['data']['id']}",
+            self.url + f"/users/{self.reg_resp.get_json()['data']['id']}",
             headers=self.auth_header,
         )
 
@@ -132,3 +146,15 @@ class TestUserRoutes(BaseTestCase):
                 'error': 'email not registered'
             }
         })
+
+    def test_delete_user_failure(self) -> None:
+        response = self.test_client.delete(
+            self.url + f"/users/{self.reg_resp_.get_json()['data']['id']}",
+            headers=self.auth_header,
+        )
+
+        self.assertEqual(response.status_code, 404)
+
+
+if __name__ == '__main__':
+    unittest.main()
