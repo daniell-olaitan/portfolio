@@ -1,0 +1,27 @@
+{% extends "auth/login.html" %}
+{% block title %}{{ meta.title }}{% endblock %}
+{% block form %}
+  <div class="form-wrapper">
+    <div class="auth-form">
+      <h1>{{ meta.heading }}</h1>
+      <form action="{{ meta.action_url }}" method="post" enctype="multipart/form-data" novalidate>
+        {{ form.hidden_tag() }}
+        {% for field in form if field.name != 'csrf_token' and field.type != 'SubmitField' %}
+          <div class="form-group">
+              <label>{{ field.label.text }}</label>
+              {{ field(class="input-field") }}
+              {% if field.errors %}
+                  <div class="form-error">
+                      {{ field.errors[0] }}
+                  </div>
+              {% endif %}
+          </div>
+        {% endfor %}
+
+        <div class="form-group auth-btn">
+            <button type="submit" class="submit-btn">{{ meta.action }}</button>
+        </div>
+      </form>
+    </div>
+  </div>
+{% endblock %}

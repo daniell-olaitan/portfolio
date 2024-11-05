@@ -1,0 +1,37 @@
+{% extends "base.html" %}
+{% block title %}Dashboard{% endblock %}
+{% block extra_css %}<link rel="stylesheet" href="{{ url_for('admin.static', filename='styles/dashboard.css') }}">{% endblock %}
+{% block content %}
+<div class="topbar">
+    <span style="font-weight: bold;">Welcome, {{ firstname }}</span>
+</div>
+
+<h1 style="margin-bottom: 50px;">Dashboard</h1>
+<div class="sections">
+    {% for heading, resources in resource.items() %}
+    <h2>{{ heading }} </h2>
+    <table class="section-table item-table">
+        <tr>
+            <th>Name</th>
+            <th>Date</th>
+            <th>Actions</th>
+        </tr>
+        {% for item in resources.item %}
+        <tr>
+            <td>{{ item.title | truncate(50) if item.title else item.name | truncate(50) }}</td>
+            <td>{{ item.created_at.split('T')[0] }}</td>
+            <td>
+              <a class="normal-a" href="{{ url_for('admin.edit_item', item=resources.item_name, item_id=item.id) }}">Edit</a> |
+              {% if resources.sub_item %}
+                <a class="normal-a" href="{{ url_for('admin.view_item', item=resources.item_name, item_id=item.id, sub_item=resources.sub_item) }}">Details</a> |
+              {% else %}
+                <a class="normal-a" href="{{ url_for('admin.view_item', item=resources.item_name, item_id=item.id) }}">Details</a> |
+              {% endif %}
+              <a class="normal-a" data-href="{{ url_for('admin.delete_item', item=resources.item_name, item_id=item.id) }}" onclick="confirmAction(this)">Delete</a>
+            </td>
+        </tr>
+        {% endfor %}
+    </table>
+    {% endfor %}
+</div>
+{% endblock %}

@@ -7,8 +7,8 @@ from models.base_model import BaseModel
 
 
 class GitRef(BaseModel, db.Model):
-    __tablename__ = 'git_refs'
-    open_source_contribution_id = db.Column(
+    __tablename__ = 'gitrefs'
+    contribution_id = db.Column(
         db.String(60),
         db.ForeignKey('contributions.id')
     )

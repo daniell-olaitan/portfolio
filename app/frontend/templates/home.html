@@ -1,0 +1,114 @@
+{% extends "parent.html" %}
+{% block title %}{{ current_user.name }} | Portfolio{% endblock %}
+{% block content %}
+<div class="mx-auto max-w-5xl">
+  <section class="flex flex-col gap-6 text-justify mb-10 sm:mb-14 xl:mb-20 border-b-2 pb-12 border-gray-300">
+    <div class="flex flex-col gap-3 items-center">
+      {% if current_user.profile.tagline %}
+      <h3 class="text-center">{{ current_user.profile.tagline }}</h3>
+      {% endif %}
+      {% if current_user.profile.location %}
+      <p class="text-lg sm:text-xl text-gray-500">{{ current_user.profile.location }}</p>
+      {% endif %}
+      <div class="flex gap-3 mb-12">
+        <p class="text-lg sm:text-xl text-gray-500">
+          Phone: <span class="text-blue-500">{{ current_user.phone }}</span>
+        </p> |
+        <p class="text-lg sm:text-xl text-gray-500">
+          Email: <a href="mailto:{{ current_user.email }}" class="text-blue-500 hover:underline">{{ current_user.email }}</a>
+        </p>
+      </div>
+      <a
+        href="#contact"
+        class="w-max-content hover:opacity-50 bg-blue-500 text-white font-semibold py-3 px-5 rounded"
+      >
+        Contact Me
+      </a>
+    </div>
+  </section>
+
+  <section class="flex flex-col gap-12 items-center mb-10 sm:mb-14 xl:mb-20 border-b-2 last:border-b-0 pb-12 border-gray-300">
+    <h2>About Me</h2>
+    {% if current_user.profile.bio %}
+    <p class="text-xl sm:text-2xl text-justify">{{ current_user.profile.bio }}</p>
+    {% endif %}
+  </section>
+
+  <section class="flex flex-col gap-6 text-justify mb-10 sm:mb-14 xl:mb-20 border-b-2 pb-12 border-gray-300">
+    <div class="flex flex-col gap-12 items-center">
+      <h2>Services/Expertise</h2>
+      <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-8">
+        {% for service in current_user.profile.services %}
+        <div class="p-6 bg-white rounded-lg shadow-lg text-center">
+            <h3 class="mb-4">{{ service.title }}</h3>
+            <p class="text-lg sm:text-xl">{{ service.description }}</p>
+        </div>
+        {% endfor %}
+      </div>
+    </div>
+  </section>
+
+  <section class="flex flex-col gap-8 items-center mb-10 sm:mb-14 xl:mb-20 border-b-2 last:border-b-0 pb-12 border-gray-300">
+    <div class="flex flex-col gap-12 items-center mb-12">
+      <h2>Ready to collaborate?</h2>
+      <p class="text-xl sm:text-2xl text-justify">
+        Contact me today to discuss how I can help bring your project to life or how I can join your team!
+      </p>
+    </div>
+    <a
+        href="#contact"
+        class="w-max-content hover:opacity-50 bg-blue-500 text-white font-semibold py-3 px-5 rounded"
+      >
+        Get In Touch
+      </a>
+  </section>
+
+  <section id="contact" class="flex flex-col gap-8 items-center mb-10 sm:mb-14 xl:mb-20 border-b-2 last:border-b-0 pb-12 border-gray-300">
+    <h2>Connect With Me</h2>
+    <div class="flex flex-col gap-3 items-center mb-36">
+      <div class="flex gap-8">
+      {% for contact in current_user.profile.contacts %}
+        <a
+          href="{{ contact.url }}"
+          class="w-max-content hover:opacity-50 text-blue-500 font-semibold cursor-pointer text-xl"
+          target="_blank"
+        >
+          {{ contact.name }}
+        </a>
+      {% endfor %}
+      </div>
+      <a
+        href="mailto:{{ current_user.email }}"
+        class="w-max-content hover:opacity-50 text-blue-500 font-semibold cursor-pointer text-xl"
+        target="_blank"
+      >
+        {{ current_user.email }}
+      </a>
+    </div>
+
+    {% if current_user.profile.resume %}
+    <div class="flex gap-12 flex-col items-center">
+      <h1>My Resume</h1>
+      <div class="flex gap-8">
+        <a
+          href="{{ url_for('serve_file', filename=current_user.profile.resume) }}"
+          class="w-max-content hover:opacity-50 bg-blue-500 text-white font-semibold py-3 px-5 rounded"
+          target="_blank"
+        >
+          View Resume
+        </a>
+
+        <a
+          href="{{ url_for('download_file', filename=current_user.profile.resume) }}"
+          class="w-max-content hover:opacity-50 bg-blue-500 text-white font-semibold py-3 px-5 rounded"
+          target="_blank"
+        >
+          Download Resume
+        </a>
+      </div>
+    </div>
+    {% endif %}
+  </section>
+
+</div>
+{% endblock %}

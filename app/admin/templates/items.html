@@ -1,0 +1,29 @@
+{% extends "base.html" %}
+{% block title %}{{ heading }} | Portfolio{% endblock %}
+{% block extra_css %}<link rel="stylesheet" href="{{ url_for('admin.static', filename='styles/dashboard.css') }}">{% endblock %}
+{% block content %}
+<h1>{{ heading }}</h1>
+    <a class="normal-a" href="{{ url_for('admin.create_item', parent='users', parent_id=current_user.id, item=item_name) }}">Add {{ heading[:-1] }}</a>
+    <table class="section-table item-table">
+        <tr>
+            <th>Name</th>
+            <th>Date</th>
+            <th>Actions</th>
+        </tr>
+        {% for item in items %}
+        <tr>
+            <td>{{ item.title | truncate(50) if item.title else item.name | truncate(50) }}</td>
+            <td>{{ item.created_at.split('T')[0] }}</td>
+            <td>
+              <a class="normal-a" href="{{ url_for('admin.edit_item', item=item_name, item_id=item.id) }}">Edit</a> |
+              {% if sub_item %}
+                <a class="normal-a" href="{{ url_for('admin.view_item', item=item_name, item_id=item.id, sub_item=sub_item) }}">Details</a> |
+              {% else %}
+                <a class="normal-a" href="{{ url_for('admin.view_item', item=item_name, item_id=item.id) }}">Details</a> |
+              {% endif %}
+              <a class="normal-a" data-href="{{ url_for('admin.delete_item', item=item_name, item_id=item.id) }}" onclick="confirmAction(this)">Delete</a>
+            </td>
+        </tr>
+        {% endfor %}
+    </table>
+{% endblock %}

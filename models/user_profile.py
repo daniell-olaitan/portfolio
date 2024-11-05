@@ -2,6 +2,7 @@
 from models import db
 from models.base_model import BaseModel
 from models.contact import Contact
+from models.service import Service
 
 
 class UserProfile(BaseModel, db.Model):
@@ -16,14 +17,23 @@ class UserProfile(BaseModel, db.Model):
     )
 
     image_url = db.Column(db.String(256))
-    bio = db.Column(db.String(2048))
+    bio = db.Column(db.Text)
     location = db.Column(db.String(80))
-    project_header = db.Column(db.String(2048))
-    work_header = db.Column(db.String(2048))
-    article_header = db.Column(db.String(2048))
+    tagline = db.Column(db.Text)
+    project_header = db.Column(db.Text)
+    work_header = db.Column(db.Text)
+    article_header = db.Column(db.Text)
+    contribution_header = db.Column(db.Text)
     resume = db.Column(db.String(256))
     contacts = db.relationship(
         'Contact',
+        backref='user_profile',
+        cascade='all, delete-orphan',
+        lazy='dynamic'
+    )
+
+    services = db.relationship(
+        'Service',
         backref='user_profile',
         cascade='all, delete-orphan',
         lazy='dynamic'

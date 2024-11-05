@@ -12,4 +12,4 @@ class InvalidToken(BaseModel, db.Model):
         """
         Verify the JWT identity
         """
-        return bool(db.fetch_object_by(cls, jti=jti))
+        return bool(db.fetch_object(cls, jti=jti))

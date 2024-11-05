@@ -1,0 +1,92 @@
+{% extends "base.html" %}
+{% block title %}Edit Profile | Portfolio{% endblock %}
+{% block extra_css %}<link rel="stylesheet" href="{{ url_for('admin.static', filename='styles/forms.css') }}">{% endblock %}
+{% block content %}
+<h1>Edit Profile</h1>
+<form method="post" action="{{ action_url }}" enctype="multipart/form-data" novalidate>
+    {{ form.hidden_tag() }}
+    <div class="form-group">
+      <label>Profile Picture</label>
+      {{ form.profile_picture(class="input-field") }}
+      {% if form.profile_picture.errors %}
+          <div class="form-error">
+              {{ form.profile_picture.errors[0] }}
+          </div>
+      {% endif %}
+    </div>
+
+    <div class="form-group">
+        <label>Tagline</label>
+        {{ form.tagline(class="input-field", placeholder="optional") }}
+        {% if form.tagline.errors %}
+            <div class="form-error">
+                {{ form.tagline.errors[0] }}
+            </div>
+        {% endif %}
+    </div>
+
+    <div class="form-group">
+        <label>Location</label>
+        {{ form.location(class="input-field", placeholder="optional") }}
+        {% if form.location.errors %}
+            <div class="form-error">
+                {{ form.location.errors[0] }}
+            </div>
+        {% endif %}
+    </div>
+
+    <div class="form-group">
+        <label>Bio</label>
+        {{ form.bio(class="input-field", placeholder="optional") }}
+        {% if form.bio.errors %}
+            <div class="form-error">
+                {{ form.bio.errors[0] }}
+            </div>
+        {% endif %}
+    </div>
+
+    <div class="form-group">
+      <label>Project Header</label>
+      {{ form.project_header(class="input-field", placeholder="optional") }}
+      {% if form.project_header.errors %}
+          <div class="form-error">
+              {{ form.project_header.errors[0] }}
+          </div>
+      {% endif %}
+    </div>
+
+    <div class="form-group">
+      <label>Work Header</label>
+      {{ form.work_header(class="input-field", placeholder="optional") }}
+      {% if form.work_header.errors %}
+          <div class="form-error">
+              {{ form.work_header.errors[0] }}
+          </div>
+      {% endif %}
+    </div>
+
+    <div class="form-group">
+      <label> Header</label>
+      {{ form.project_header(class="input-field", placeholder="optional") }}
+      {% if form.project_header.errors %}
+          <div class="form-error">
+              {{ form.project_header.errors[0] }}
+          </div>
+      {% endif %}
+    </div>
+
+    <div class="form-group">
+      <label for="resume">Resume</label>
+      {{ form.resume(class="form-input", id="resume") }}
+      {% if form.resume.errors %}
+          <div class="form-error">
+              {{ form.resume.errors[0] }}
+          </div>
+      {% endif %}
+  </div>
+
+    <div class="form-group">
+        <button type="submit" class="submit-btn">Save</button>
+    </div>
+</form>
+{% endblock %}

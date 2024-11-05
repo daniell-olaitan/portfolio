@@ -14,18 +14,23 @@ class BaseModel:
     created_at = db.Column(db.DateTime, default=datetime.now())
     updated_at = db.Column(db.DateTime, default=datetime.now())
 
-    def __init__(self, **kwargs):
+    def __init__(self, **kwargs) -> None:
         super().__init__(**kwargs)
         self.id = str(uuid.uuid4())
 
     def to_json(self) -> Dict[str, Any]:
+        obj_dict = {}
         obj = vars(self)
-        obj['created_at'] = self.created_at.isoformat()
-        obj['updated_at'] = self.updated_at.isoformat()
-        if '_sa_instance_state' in obj:
-            del obj['_sa_instance_state']
+        for key, value in obj.items():
+            if key == 'created_at':
+                obj_dict['created_at'] = self.created_at.isoformat()
+            elif key == 'updated_at':
+                obj_dict['updated_at'] = self.updated_at.isoformat()
+            elif key == '_sa_instance_state' or key == 'password':
+                continue
+            elif 'date' in key:
+                obj_dict[key] = value.strftime('%Y-%m-%d')
+            else:
+                obj_dict[key] = value
 
-        if 'password' in obj:
-            del obj['password']
-
-        return obj
+        return obj_dict

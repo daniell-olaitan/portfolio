@@ -1,0 +1,15 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+body {
+  font-family: 'Josefin Sans', sans-serif;
+}
+
+@layer utilities {
+  body { @apply min-h-screen font-light text-gray-600 bg-custom-gradient p-4 sm:py-14 sm:px-8 xl:py-20 }
+  html { @apply bg-white min-h-screen }
+  h1 { @apply text-5xl font-medium }
+  h2 { @apply text-3xl font-medium }
+  h3 { @apply text-xl font-medium }
+}

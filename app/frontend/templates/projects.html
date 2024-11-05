@@ -1,0 +1,86 @@
+{% extends "parent.html" %}
+{% block title %}Projects | Portfolio{% endblock %}
+{% block content %}
+<div class="mx-auto max-w-5xl">
+  <div class="flex flex-col gap-6 text-justify mb-14 xl:mb-20 border-b-2 pb-12 border-gray-300">
+    <h1 class="capitalize">Projects</h1>
+    {% if current_user.profile.project_header %}
+      <p class="text-xl sm:text-2xl">{{ current_user.profile.project_header }}</p>
+    {% endif %}
+  </div>
+
+  <ul>
+    {% if projects %}
+      {% for project in projects %}
+        <li class="flex flex-col gap-8 mb-10 sm:mb-14 xl:mb-20 border-b-2 last:border-b-0 pb-12 border-gray-300">
+
+          <h2>{{ project.title }}</h2>
+
+          {% if project.image_url %}
+              <img
+                class="rounded-2xl mb-12 shadow-xl inline-block" width="752" height="830" alt="Screenshot"
+                src="{{ url_for('serve_file', filename=project.image_url) }}"
+              />
+          {% endif %}
+
+          {% if project.video_url %}
+              <video class="rounded-2xl mb-12 shadow-xl inline-block" controls width="752" height="830">
+                <source src="{{ url_for('serve_file', filename=project.video_url) }}" type="video/mp4" />
+                Your browser does not support the video tag.
+              </video>
+          {% endif %}
+
+          <p class="text-xl sm:text-2xl text-justify">{{ project.description }}</p>
+
+          {% if project.features %}
+            <div class="flex flex-col gap-2 mb-8">
+              <h3 class="text-gray-600">The features of the project are:</h3>
+              <ul class="flex flex-col gap-8 text-xl sm:text-2xl">
+              {% for feature in project.features %}
+                <li class="text-xl sm:text-2xl text-gray-500">
+                  <h3 class="text-gray-600">{{ feature.name }}</h3>
+                  <p class="text-xl sm:text-2xl text-justify">{{ feature.description }}</p>
+                </li>
+              {% endfor %}
+              </ul>
+            </div>
+          {% endif %}
+
+          {% if project.skills %}
+            <div class="flex flex-col gap-2 mb-20">
+              <h3 class="text-gray-600">The skills gained/honed during the course of this project are:</h3>
+              <ul class="flex flex-col gap-1 text-xl sm:text-2xl">
+              {% for skill in project.skills %}
+                <li class="before:content-['>'] text-xl sm:text-2xl text-gray-500">
+                  {{ skill }}
+                </li>
+              {% endfor %}
+              </ul>
+            </div>
+          {% endif %}
+          <div class="flex gap-12">
+            {% if project.github_url %}
+              <a
+                href="{{ project.github_url }}"
+                class="w-max-content hover:opacity-50 bg-blue-500 text-white font-semibold py-3 px-5 rounded"
+              >
+                Github Repo
+              </a>
+            {% endif %}
+            {% if project.project_url %}
+              <a
+                href="{{ project.project_url }}"
+                class="w-max-content hover:opacity-50 bg-blue-500 text-white font-semibold py-3 px-5 rounded"
+              >
+                Visit Site
+              </a>
+            {% endif %}
+          </div>
+        </li>
+      {% endfor %}
+    {% else %}
+      <div class="text-xl sm:text-2xl text-justify">No projects available.</div>
+    {% endif %}
+  </ul>
+</div>
+{% endblock %}

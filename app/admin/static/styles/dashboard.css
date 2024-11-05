@@ -1,0 +1,43 @@
+h1 {
+    color: #333;
+    font-size: 2em;
+    margin-bottom: 20px;
+}
+
+.section-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-bottom: 50px;
+}
+
+.section-table th, .section-table td {
+    padding: 10px;
+    border: 1px solid #ddd;
+    text-align: left;
+}
+
+.section-table th {
+    background-color: #007bff;
+    color: white;
+}
+
+.section-table tr:nth-child(even) {
+    background-color: #f9f9f9;
+}
+
+.section-table tr:hover {
+    background-color: #f1f1f1;
+}
+
+.section-table a {
+    color: #007bff;
+    text-decoration: none;
+}
+
+.item-table {
+    margin-top: 20px;
+}
+
+.sect {
+    margin-bottom: 60px;
+}

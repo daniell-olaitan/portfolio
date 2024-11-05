@@ -1,0 +1,107 @@
+{% extends "parent.html" %}
+{% block title %}Contributions | Portfolio{% endblock %}
+{% block content %}
+<div class="mx-auto max-w-5xl">
+  <div class="flex flex-col gap-6 text-justify mb-14 xl:mb-20 border-b-2 pb-12 border-gray-300">
+    <h1 class="capitalize">Contributions</h1>
+    {% if current_user.profile.contribution_header %}
+      <p class="text-xl sm:text-2xl">{{ current_user.profile.contribution_header }}</p>
+    {% endif %}
+  </div>
+
+  <ul>
+    {% if contributions %}
+      {% for contribution in contributions %}
+        <li class="flex flex-col gap-8 mb-10 sm:mb-14 xl:mb-20 border-b-2 last:border-b-0 pb-12 border-gray-300">
+
+          <div class="flex flex-col gap-3">
+            <h2>{{ contribution.name }}</h2>
+            <p class="text-lg sm:text-xl text-gray-500">Date: {{ contribution.date }}</p>
+            <p class="text-lg sm:text-xl text-gray-500">Type: {{ contribution.contribution_type }}</p>
+            <p class="text-lg sm:text-xl text-gray-500">Role: {{ contribution.role }}</p>
+          </div>
+
+          <div class="flex flex-col gap-2 mb-8">
+            <h3 class="text-gray-600">Descriptions:</h3>
+            <ul class="flex flex-col gap-4 text-xl sm:text-2xl">
+            {% for description in contribution.descriptions %}
+              <li class="text-xl sm:text-2xl text-gray-500">
+                <p class="before:content-['>'] text-xl sm:text-2xl text-justify">{{ description }}</p>
+              </li>
+            {% endfor %}
+            </ul>
+          </div>
+
+          {% if contribution.gitrefs %}
+            <div class="flex flex-col gap-2 mb-8">
+              <h3 class="text-gray-600">Contributions:</h3>
+              <ul class="flex flex-col gap-16 text-xl sm:text-2xl">
+              {% for gitref in contribution.gitrefs %}
+                <li class="text-xl sm:text-2xl text-gray-500 flex flex-col gap-8">
+                  <div class="flex flex-col gap-3">
+                    <p class="text-xl sm:text-2xl">commit id: <span class="text-blue-500">{{ gitref.commit_id }}</span></p>
+                    <p class="text-xl sm:text-2xl">status: {{ gitref.status }}</p>
+                  </div>
+
+                  <div class="flex gap-12">
+                    <a
+                      href="{{ gitref.pull_request_url }}"
+                      class="w-max-content hover:opacity-50 text-blue-500 font-semibold text-xl"
+                    >
+                      View Pull Request
+                    </a>
+
+                    {% if gitref.issue_url %}
+                      <a
+                        href="{{ gitref.issue_url }}"
+                        class="w-max-content hover:opacity-50 text-blue-500 font-semibold text-xl"
+                      >
+                        View Issue
+                      </a>
+                    {% endif %}
+                </li>
+              {% endfor %}
+              </ul>
+            </div>
+          {% endif %}
+
+          <div class="flex flex-col gap-2 mb-8">
+            <h3 class="text-gray-600">Technologies used:</h3>
+            <ul class="flex flex-col gap-4 text-xl sm:text-2xl">
+            {% for technology in contribution.technologies %}
+              <li class="text-xl sm:text-2xl text-gray-500">
+                <p class="before:content-['>'] text-xl sm:text-2xl text-justify">{{ technology }}</p>
+              </li>
+            {% endfor %}
+            </ul>
+          </div>
+
+          <div class="flex flex-col gap-2 mb-8">
+            <h3 class="text-gray-600">The skills gained/honed from this contribution are:</h3>
+            <ul class="flex flex-col gap-4 text-xl sm:text-2xl">
+            {% for skill in contribution.skills %}
+              <li class="text-xl sm:text-2xl text-gray-500">
+                <p class="before:content-['>'] text-xl sm:text-2xl text-justify">{{ skill }}</p>
+              </li>
+            {% endfor %}
+            </ul>
+          </div>
+
+          <div class="flex flex-col gap-2 mb-8">
+            <h3 class="text-gray-600">Impacts of the contribution are:</h3>
+            <ul class="flex flex-col gap-4 text-xl sm:text-2xl">
+            {% for impact in contribution.impacts %}
+              <li class="text-xl sm:text-2xl text-gray-500">
+                <p class="before:content-['>'] text-xl sm:text-2xl text-justify">{{ impact }}</p>
+              </li>
+            {% endfor %}
+            </ul>
+          </div>
+        </li>
+      {% endfor %}
+    {% else %}
+      <div class="text-xl sm:text-2xl text-justify">No contributions available.</div>
+    {% endif %}
+  </ul>
+</div>
+{% endblock %}

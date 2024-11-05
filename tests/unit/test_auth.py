@@ -14,7 +14,7 @@ if project_root not in sys.path:
 
 import unittest
 from hashlib import md5
-from app.v1.auth.auth import Auth
+from app.api.v1.auth.auth import Auth
 from unittest.mock import (
     patch,
     MagicMock

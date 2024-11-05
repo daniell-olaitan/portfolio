@@ -1,0 +1,82 @@
+{% extends "base.html" %}
+{% block title %}Details | Portfolio{% endblock %}
+{% block extra_css %}<link rel="stylesheet" href="{{ url_for('admin.static', filename='styles/details.css') }}">{% endblock %}
+{% block content %}
+<div class="details-container small-br">
+    <h1>{{ title }}</h1>
+    <p class="date-created">Created on: {{ resource.date }}</p>
+  {% for name, detail in resource.details.items() %}
+    {% if 'Image' in name or 'Video' in name %}
+    <div class="details">
+      <h2 class="detail-name">{{ name }}</h2>
+      {% if detail %}
+        <a class="normal-a" href="{{ url_for('serve_file', filename=detail) }}" target="_blank">View</a>
+      {% else %}
+        <span>No file available</span>
+      {% endif %}
+    </div>
+    {% elif name in ['Skills', 'Tags', 'Technologies', 'Impacts', 'Descriptions'] %}
+    <div class="details">
+        <h2 class="detail-name">{{ name }}</h2>
+        {% if detail %}
+        <ul>
+          {% for item in detail %}
+          <ol class="detail-value">{{ item }}</ol>
+          {% endfor %}
+        </ul>
+        {% else %}
+        <p class="detail-value">{{ detail }}</p>
+        {% endif %}
+    </div>
+    {% elif 'Date' in name %}
+    <div class="details">
+      <h2 class="detail-name">{{ name }}</h2>
+      <p class="detail-value">{{ detail }}</p>
+    </div>
+    {% else %}
+    <div class="details">
+      <h2 class="detail-name">{{ name }}</h2>
+      <p class="detail-value">{{ detail }}</p>
+    </div>
+    {% endif %}
+  {% endfor %}
+
+    <div class="back-link">
+        <a class="normal-a" href="{{ url_for('admin.edit_item', item=resource.item_name, item_id=resource.item_id) }}">Edit</a>
+    </div>
+</div>
+
+{% if sub_resource %}
+<div class="details-container small-br">
+  <h1>{{ sub_resource.heading }}</h1>
+  <a class="normal-a" href="{{ url_for('admin.create_item', parent=resource.item_name, parent_id=resource.item_id, item=sub_resource.item_name) }}">Add {{ sub_resource.heading[:-1] }}</a>
+  {% for sub_item in sub_resource.sub_items %}
+    <h1>{{ sub_item.heading }} {{ loop.index }}</h1>
+    <p class="date-created">Created on: {{ sub_item.date }}</p>
+
+    {% for name, detail in sub_item.details.items() %}
+      {% if 'Image' in name or 'Video' in name %}
+      <div class="details">
+        <h2 class="detail-name">{{ name }}</h2>
+        {% if detail %}
+          <a class="normal-a" href="{{ url_for('serve_file', filename=detail) }}" target="_blank">View</a>
+        {% else %}
+          <span>No file available</span>
+        {% endif %}
+      </div>
+      {% else %}
+      <div class="details">
+        <h2 class="detail-name">{{ name }}</h2>
+        <p class="detail-value">{{ detail }}</p>
+      </div>
+      {% endif %}
+    {% endfor %}
+
+    <div class="back-link">
+      <a class="normal-a" href="{{ url_for('admin.edit_item', item=sub_item.item_name, item_id=sub_item.item_id) }}">Edit</a>
+        <a data-href="{{ url_for('admin.delete_item', item=sub_item.item_name, item_id=sub_item.item_id) }}" onclick="confirmAction(this)">Delete</a>
+    </div>
+    {% endfor %}
+  </div>
+  {% endif %}
+{% endblock %}

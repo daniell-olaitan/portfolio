@@ -1,0 +1,31 @@
+{% extends "base.html" %}
+{% block title %}Dashboard{% endblock %}
+{% block extra_css %}<link rel="stylesheet" href="{{ url_for('admin.static', filename='styles/dashboard.css') }}">{% endblock %}
+{% block content %}
+<div class="topbar">
+    <span style="font-weight: bold;">Welcome, Daniel</span>
+</div>
+
+<h1>Dashboard</h1>
+<div>
+    <h2>Projects</h2>
+    <table class="project-table">
+        <tr>
+            <th>Title</th>
+            <th>Date</th>
+            <th>Actions</th>
+        </tr>
+        {% for project in projects %}
+        <tr>
+            <td>{{ project.title }}</td>
+            <td>{{ project.date_created }}</td>
+            <td>
+                <a href="{{ url_for('admin.edit_project', project_id=project.id) }}">Edit</a> |
+                <a href="{{ url_for('admin.view_project') }}">Details</a> |
+                <a href="">Delete</a>
+            </td>
+        </tr>
+        {% endfor %}
+    </table>
+</div>
+{% endblock %}

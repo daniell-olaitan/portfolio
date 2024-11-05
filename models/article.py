@@ -14,4 +14,13 @@ class Article(BaseModel, db.Model):
 
     title = db.Column(db.String(60), nullable=False)
     content = db.Column(db.Text, nullable=False)
-    created_at = db.Column(db.DateTime, nullable=False, default=datetime.now())
+    tags = db.Column(
+        db.Text, nullable=False
+    )  # List of tags separated by '::'
+
+    def to_json(self):
+        obj_dict = super().to_json()
+        if obj_dict['tags']:
+            obj_dict['tags'] = obj_dict['tags'].split('::')
+
+        return obj_dict

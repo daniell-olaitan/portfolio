@@ -123,7 +123,7 @@ class TestUserRoutes(BaseTestCase):
             json=data
         )
 
-        self.assertEqual(response.status_code, 404)
+        self.assertEqual(response.status_code, 403)
 
     def test_delete_user_success(self) -> None:
         response = self.test_client.delete(
@@ -147,13 +147,21 @@ class TestUserRoutes(BaseTestCase):
             }
         })
 
-    def test_delete_user_failure(self) -> None:
+    def test_delete_user_wrong_user(self) -> None:
+        response = self.test_client.delete(
+            self.url + '/users/invalid_user',
+            headers=self.auth_header,
+        )
+
+        self.assertEqual(response.status_code, 404)
+
+    def test_delete_user_wrong_user(self) -> None:
         response = self.test_client.delete(
             self.url + f"/users/{self.reg_resp_.get_json()['data']['id']}",
             headers=self.auth_header,
         )
 
-        self.assertEqual(response.status_code, 404)
+        self.assertEqual(response.status_code, 403)
 
 
 if __name__ == '__main__':

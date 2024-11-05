@@ -1,0 +1,64 @@
+{% extends "parent.html" %}
+{% block title %}work | Portfolio{% endblock %}
+{% block content %}
+<div class="mx-auto max-w-5xl">
+  <div class="flex flex-col gap-6 text-justify mb-14 xl:mb-20 border-b-2 pb-12 border-gray-300">
+    <h1 class="capitalize">work</h1>
+    {% if current_user.profile.work_header %}
+      <p class="text-xl sm:text-2xl">{{ current_user.profile.work_header }}</p>
+    {% endif %}
+  </div>
+
+  <ul>
+    {% if works %}
+      {% for work in works %}
+        <li class="flex flex-col gap-12 mb-10 sm:mb-14 xl:mb-20 border-b-2 last:border-b-0 pb-12 border-gray-300">
+
+          <div class="flex flex-col gap-3">
+            <h2>{{ work.title }}</h2>
+            <p class="text-lg sm:text-xl text-gray-500">{{ work.company }}</p>
+            <p class="text-lg sm:text-xl text-gray-500">From {{ work.start_date }} to {{ work.end_date }}</p>
+          </div>
+
+          {% if work.image_url %}
+              <img
+                class="rounded-2xl mb-12 shadow-xl inline-block" width="752" height="830" alt="Screenshot"
+                src="{{ url_for('serve_file', filename=work.image_url) }}"
+              />
+          {% endif %}
+
+          <p class="text-xl sm:text-2xl text-justify">{{ work.description }}</p>
+
+          {% if work.experiences %}
+            <div class="flex flex-col gap-2 mb-8">
+              <h3 class="text-gray-600">Experiences:</h3>
+              <ul class="flex flex-col gap-4 text-xl sm:text-2xl">
+              {% for experience in work.experiences %}
+                <li class="text-xl sm:text-2xl text-gray-500">
+                  <p class="before:content-['>'] text-xl sm:text-2xl text-justify">{{ experience.result }}</p>
+                </li>
+              {% endfor %}
+              </ul>
+            </div>
+          {% endif %}
+
+          {% if work.skills %}
+            <div class="flex flex-col gap-2 mb-20">
+              <h3 class="text-gray-600">The skills gained/honed from this work are:</h3>
+              <ul class="flex flex-col gap-1 text-xl sm:text-2xl">
+              {% for skill in work.skills %}
+                <li class="before:content-['>'] text-xl sm:text-2xl text-gray-500">
+                  {{ skill }}
+                </li>
+              {% endfor %}
+              </ul>
+            </div>
+          {% endif %}
+        </li>
+      {% endfor %}
+    {% else %}
+      <div class="text-xl sm:text-2xl text-justify">No work available.</div>
+    {% endif %}
+  </ul>
+</div>
+{% endblock %}

@@ -1,8 +1,9 @@
 #!/usr/bin/env python3
 from models import db
 from models.base_model import BaseModel
-from models.skill import Skill
 from models.feature import Feature
+from sqlalchemy import event
+from utils import delete_file
 
 
 class Project(BaseModel, db.Model):
@@ -15,14 +16,13 @@ class Project(BaseModel, db.Model):
 
     title = db.Column(db.String(60), nullable=False)
     image_url = db.Column(db.String(256))
-    description = db.Column(db.String(2048), nullable=False)
+    video_url = db.Column(db.String(120), nullable=True)
+    description = db.Column(db.Text, nullable=False)
     project_url = db.Column(db.String(256))
     github_url = db.Column(db.String(256))
-    skills = db.relationship(
-        'Skill',
-        backref='project',
-        lazy='dynamic'
-    )
+    skills = db.Column(
+        db.Text, nullable=False
+    )  # List of skills separated by '::'
 
     features = db.relationship(
         'Feature',
@@ -30,3 +30,22 @@ class Project(BaseModel, db.Model):
         cascade='all, delete-orphan',
         lazy='dynamic'
     )
+
+    def to_json(self):
+        obj_dict = super().to_json()
+
+        if obj_dict['skills']:
+            obj_dict['skills'] = obj_dict['skills'].split('::')
+
+        return obj_dict
+
+
+def delete_files(mapper, connection, target):
+    if target.image_url:
+        delete_file(target.image_url)
+
+    if target.video_url:
+        delete_file(target.video_url)
+
+
+event.listen(Project, 'after_delete', delete_files)

@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}Login{% endblock %} | Portfolio</title>
+    <link rel="icon" type="image/x-icon" href="{{ url_for('admin.static', filename='images/favicon.ico') }}">
+    <link rel="stylesheet" href="{{ url_for('admin.static', filename='styles/forms.css') }}">
+    <link rel="stylesheet" href="{{ url_for('admin.static', filename='styles/auth.css') }}">
+</head>
+<body>
+<div class="wrapper">
+
+  {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+            <div class="flash-messages">
+            {% for category, message in messages %}
+                <div class="alert alert-{{ category }}">{{ message }}</div>
+            {% endfor %}
+            </div>
+        {% endif %}
+        {% endwith %}
+
+    {% block form %}
+    <div class="form-wrapper">
+      <div class="auth-form">
+        <h1>Login</h1>
+        <form action="{{ url_for('admin.login') }}" method="post" enctype="multipart/form-data" novalidate>
+          {{ form.hidden_tag() }}
+          <div class="form-group">
+              <label for="email">Email</label>
+              {{ form.email(class="input-field") }}
+              {% if form.email.errors %}
+                  <div class="form-error">
+                      {{ form.email.errors[0] }}
+                  </div>
+              {% endif %}
+          </div>
+          <div class="form-group">
+              <label for="password">Password</label>
+              {{ form.password(class="input-field") }}
+              {% if form.password.errors %}
+                  <div class="form-error">
+                      {{ form.password.errors[0] }}
+                  </div>
+              {% endif %}
+          </div>
+          <a style="color: #007bff; text-decoration: none;" href="{{ url_for('admin.forgot_password') }}">Forgot password?</a>
+          <div class="form-group auth-btn">
+              <button type="submit" class="submit-btn">Login</button>
+          </div>
+        </form>
+      </div>
+    </div>
+    {% endblock %}
+    <footer>
+      <p>&copy; <span id="year"></span> Portfolio. All rights reserved.</p>
+      <a
+        href="https://github.com/daniell-olaitan"
+        target="_blank"
+        style="color: #007bff; text-decoration: none;"
+      >
+          Github
+      </a>
+    </footer>
+  </div>
+
+  <script>
+    document.addEventListener('DOMContentLoaded', function() {
+      const yearSpan = document.getElementById('year');
+      const currentYear = new Date().getFullYear();
+      yearSpan.textContent = currentYear;
+    });
+  </script>
+
+</body>
+</html>

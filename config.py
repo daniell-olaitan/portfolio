@@ -12,6 +12,13 @@ class Config:
     GOOGLE_CLIENT_ID = getenv("GOOGLE_CLIENT_ID", None)
     GOOGLE_CLIENT_SECRET = getenv("GOOGLE_CLIENT_SECRET", None)
     GOOGLE_REDIRECT_URI = 'https://127.0.0.1:5000/v1/auth/login-callback'
+    MAIL_SERVER = 'smtp.gmail.com'
+    MAIL_PORT = 587
+    MAIL_USE_TLS = True
+    MAIL_USERNAME = getenv('MAIL_USERNAME')
+    MAIL_PASSWORD = getenv('MAIL_PASSWORD')
+    MAIL_SENDER = getenv('MAIL_SENDER')
+    REDIS_URI = 'redis://localhost:6379/0'
 
 
 class DevelopmentConfig(Config):
@@ -37,6 +44,8 @@ class DeploymentConfig(Config):
         getenv('DATABASE_PORT'),
         getenv('DATABASE')
     )
+
+    OTP_EXPIRATION = 300
 
 
 config = {

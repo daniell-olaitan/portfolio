@@ -26,8 +26,7 @@ class TestDBStrorage(unittest.TestCase):
     Test class for DBStorage class
     """
 
-    @patch('models.engines.db_storage.SQLAlchemy')
-    def setUp(self, _) -> None:
+    def setUp(self) -> None:
         """
         Set up default values before the test
         """

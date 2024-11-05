@@ -1,0 +1,48 @@
+{% extends "parent.html" %}
+{% block title %}Articles | Portfolio{% endblock %}
+{% block content %}
+<div class="mx-auto max-w-5xl">
+  <div class="flex flex-col gap-6 text-justify mb-14 xl:mb-20 border-b-2 pb-12 border-gray-300">
+    <h1 class="capitalize">Articles</h1>
+    {% if current_user.profile.article_header %}
+      <p class="text-xl sm:text-2xl">{{ current_user.profile.article_header }}</p>
+    {% endif %}
+  </div>
+
+  <ul>
+    {% if articles %}
+      {% for article in articles %}
+        <li class="flex flex-col gap-8 mb-10 sm:mb-14 xl:mb-20 border-b-2 last:border-b-0 pb-12 border-gray-300">
+          <div class="flex flex-col gap-3">
+            <h2>{{ article.title }}</h2>
+            <ul class="flex gap-2">
+              {% for tag in article.tags %}
+              <li>
+                <span
+                  class="text-lg text-blue-500 border-blue-500 border rounded-full py-1 px-2 opacity-100 hover:opacity-50 transition-opacity duration-200"
+                >
+                  {{ tag }}
+                </span>
+              </li>
+              {% endfor %}
+            </ul>
+            <p class="text-lg sm:text-xl text-gray-500">{{ article.created_at.split('T')[0] }}</p>
+          </div>
+
+          <p class="text-xl sm:text-2xl text-justify">{{ article.content | truncate(300) }}</p>
+
+          <a
+            href="{{ url_for('frontend.get_article', article_id=article.id) }}"
+            class="w-max-content hover:opacity-50 text-blue-500 font-semibold after:content-['>'] text-xl"
+          >
+            Read Article
+          </a>
+
+        </li>
+      {% endfor %}
+    {% else %}
+      <div class="text-xl sm:text-2xl text-justify">No articles available.</div>
+    {% endif %}
+  </ul>
+</div>
+{% endblock %}

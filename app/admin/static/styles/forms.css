@@ -1,0 +1,44 @@
+h1 {
+    color: #333;
+    font-size: 2em;
+    margin-bottom: 20px;
+}
+
+.form-group {
+    margin-bottom: 15px;
+}
+
+.form-group label {
+    font-weight: bold;
+    display: block;
+    margin-bottom: 5px;
+    color: #555;
+}
+
+.input-field {
+    width: 100%;
+    padding: 10px;
+    font-size: 1em;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+    outline: none;
+}
+
+.input-field:focus {
+    border-color: #007bff;
+}
+
+.submit-btn {
+    background-color: #007bff;
+    color: white;
+    padding: 15px;
+    border: none;
+    font-size: 1em;
+    font-weight: bold;
+    cursor: pointer;
+    border-radius: 5px;
+}
+
+.submit-btn:hover {
+    background-color: #0056b3;
+}

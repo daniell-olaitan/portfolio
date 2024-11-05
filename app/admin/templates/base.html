@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}Admin Dashboard{% endblock %}</title>
+    <link rel="icon" type="image/x-icon" href="{{ url_for('admin.static', filename='images/favicon.ico') }}">
+    <link rel="stylesheet" href="{{ url_for('admin.static', filename='styles/base.css') }}">
+    {% block extra_css %}{% endblock %}
+</head>
+<body>
+    <div class="sidebar">
+        <h2>Dashboard</h2>
+        <a href="{{ url_for('admin.dashboard') }}">Home</a>
+        <a href="{{ url_for('admin.profile') }}">Profile</a>
+        <a href="{{ url_for('admin.fetch_items', item='projects') }}">Projects</a>
+        <a href="{{ url_for('admin.fetch_items', item='works') }}">Works</a>
+        <a href="{{ url_for('admin.fetch_items', item='contributions') }}">Open Source Contributions</a>
+        <a href="{{ url_for('admin.fetch_items', item='articles') }}">Articles</a>
+        <a
+            href="{{ url_for('admin.logout') }}"
+            style="margin-top: 20px; color: red; font-weight: bold;"
+        >
+            Log out
+        </a>
+    </div>
+
+    <div class="wrapper">
+        <div class="content">
+            {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+                <div class="flash-messages">
+                {% for category, message in messages %}
+                    <div class="alert alert-{{ category }}">{{ message }}</div>
+                {% endfor %}
+                </div>
+            {% endif %}
+            {% endwith %}
+            {% block content %}{% endblock %}
+        </div>
+            <footer>
+                <p>&copy; <span id="year"></span> Portfolio. All rights reserved.</p>
+                <a
+                  href="https://github.com/daniell-olaitan"
+                  target="_blank"
+                  style="color: #007bff; text-decoration: none;"
+                >
+                    Github
+                </a>
+            </footer>
+        </div>
+    <script>
+        function confirmAction(button) {
+            var href = button.getAttribute('data-href');
+            if (confirm("Are you sure you want to delete this item?")) {
+                window.location.href = href;
+            }
+        }
+    </script>
+</body>
+</html>

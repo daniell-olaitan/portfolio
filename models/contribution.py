@@ -5,13 +5,12 @@ Module for open source contribution model
 from models import db
 from models.base_model import BaseModel
 from models.git_ref import GitRef
-from models.skill import Skill
 
 
 class Contribution(BaseModel, db.Model):
     __tablename__ = 'contributions'
     user_id = db.Column(
-        db.Text,
+        db.String(60),
         db.ForeignKey('users.id'),
         nullable=False
     )
@@ -21,11 +20,11 @@ class Contribution(BaseModel, db.Model):
     contribution_type = db.Column(db.String(60))
     role = db.Column(db.String(60))
     date = db.Column(db.DateTime)
-    description = db.Column(
+    descriptions = db.Column(
         db.Text, nullable=False
     )  # List of actions separated by '::'
 
-    impact = db.Column(
+    impacts = db.Column(
         db.Text, nullable=False
     )  # List of impacts separated by '::'
 
@@ -33,11 +32,9 @@ class Contribution(BaseModel, db.Model):
         db.Text, nullable=False
     )  # List of tools separated by '::'
 
-    skills = db.relationship(
-        'Skill',
-        backref='contribution',
-        lazy='dynamic'
-    )
+    skills = db.Column(
+        db.Text, nullable=False
+    )  # List of skills separated by '::'
 
     git_refs = db.relationship(
         'GitRef',
@@ -45,3 +42,19 @@ class Contribution(BaseModel, db.Model):
         lazy='dynamic',
         cascade='all, delete-orphan'
     )
+
+    def to_json(self):
+        obj_dict = super().to_json()
+        if obj_dict['skills']:
+            obj_dict['skills'] = obj_dict['skills'].split('::')
+
+        if obj_dict['technologies']:
+            obj_dict['technologies'] = obj_dict['technologies'].split('::')
+
+        if obj_dict['impacts']:
+            obj_dict['impacts'] = obj_dict['impacts'].split('::')
+
+        if obj_dict['descriptions']:
+            obj_dict['descriptions'] = obj_dict['descriptions'].split('::')
+
+        return obj_dict

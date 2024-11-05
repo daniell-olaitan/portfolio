@@ -10,5 +10,5 @@ class Contact(BaseModel, db.Model):
         db.ForeignKey('user_profiles.id'),
         nullable=False
     )
-    name = db.Column(db.String(20))
-    url = db.Column(db.String(80))
+    name = db.Column(db.String(20), nullable=False)
+    url = db.Column(db.String(80), nullable=False)

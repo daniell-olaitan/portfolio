@@ -16,8 +16,9 @@ class User(BaseModel, db.Model):
     """
     __tablename__ = 'users'
     name = db.Column(db.String(128), nullable=False)
+    phone = db.Column(db.String(15), nullable=False)
     email = db.Column(db.String(128), nullable=False, unique=True)
-    password = db.Column(db.String(60))
+    password = db.Column(db.String(60), nullable=False)
     articles = db.relationship(
         'Article',
         backref='user',
@@ -70,3 +71,12 @@ class User(BaseModel, db.Model):
                 errors.append({field: f"{field} is required"})
 
         return errors
+
+    def to_json(self):
+        obj_dict = super().to_json()
+        if self.profile:
+            obj_dict['profile_id'] = self.profile.id
+        else:
+            obj_dict['profile_id'] = None
+
+        return obj_dict
