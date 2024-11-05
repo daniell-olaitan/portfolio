@@ -23,29 +23,20 @@ class Config:
 
 class DevelopmentConfig(Config):
     JWT_ACCESS_TOKEN_EXPIRES = timedelta(days=15)
+    DEBUG = True
     SQLALCHEMY_DATABASE_URI = "mysql://{}:{}@localhost/{}".format(
-        getenv('DATABASE_USERNAME_DEV'),
+        getenv('DATABASE_USERNAME'),
         getenv('DATABASE_PASSWORD'),
-        getenv('DATABASE_DEV')
+        getenv('DATABASE')
     )
 
 
 class TestingConfig(Config):
-    JWT_ACCESS_TOKEN_EXPIRES = timedelta(days=1)
     SQLALCHEMY_DATABASE_URI = 'sqlite:///:memory:'
 
 
-class DeploymentConfig(Config):
-    JWT_ACCESS_TOKEN_EXPIRES = timedelta(days=10)
-    SQLALCHEMY_DATABASE_URI = "postgresql://{}:{}@{}:{}/{}".format(
-        getenv('DATABASE_USERNAME'),
-        getenv('DATABASE_PASSWORD'),
-        getenv('DATABASE_HOST'),
-        getenv('DATABASE_PORT'),
-        getenv('DATABASE')
-    )
-
-    OTP_EXPIRATION = 300
+class DeploymentConfig(DevelopmentConfig):
+    DEBUG = False
 
 
 config = {
