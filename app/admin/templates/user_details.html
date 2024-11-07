@@ -3,22 +3,22 @@
 {% block extra_css %}<link rel="stylesheet" href="{{ url_for('admin.static', filename='styles/details.css') }}">{% endblock %}
 {% block content %}
 <div class="details-container small-br">
-    <h1>{{ current_user.name }}</h1>
-    <p class="date-created">Joined on: {{ current_user.created_at.split('T')[0] }}</p>
+    <h1>{{ user.name }}</h1>
+    <p class="date-created">Joined on: {{ user.created_at.split('T')[0] }}</p>
 
     <div class="details">
       <h2 class="detail-name">Phone</h2>
-      <p class="detail-value">{{ current_user.phone }}</p>
+      <p class="detail-value">{{ user.phone }}</p>
     </div>
 
     <div class="details">
         <h2 class="detail-name">Email</h2>
-        <p class="detail-value">{{ current_user.email }}</p>
+        <p class="detail-value">{{ user.email }}</p>
     </div>
 
     <div class="back-link">
       <div class="top-actions">
-        <a class="normal-a top-action" href="{{ url_for('admin.edit_item', item='users', item_id=current_user.id) }}">Edit</a>
+        <a class="normal-a top-action" href="{{ url_for('admin.edit_item', item='users', item_id=user.id) }}">Edit</a>
         <a class="normal-a" href="{{ url_for('admin.change_password') }}">Change Password</a>
       </div>
     </div>
@@ -29,8 +29,8 @@
 
   <div class="details">
     <h2 class="detail-name">Profile Picture</h2>
-    {% if current_user.profile.image_url %}
-        <a class="normal-a" href="{{ url_for('serve_file', filename=current_user.profile.image_url) }}" target="_blank">View</a>
+    {% if user.profile.image_url %}
+        <a class="normal-a" href="{{ url_for('serve_file', filename=user.profile.image_url) }}" target="_blank">View</a>
       {% else %}
         <span>No file available</span>
       {% endif %}
@@ -38,53 +38,53 @@
 
   <div class="details">
     <h2 class="detail-name">Tagline</h2>
-    <p class="detail-value">{{ current_user.profile.tagline }}</p>
+    <p class="detail-value">{{ user.profile.tagline }}</p>
   </div>
 
   <div class="details">
     <h2 class="detail-name">Location</h2>
-    <p class="detail-value">{{ current_user.profile.location }}</p>
+    <p class="detail-value">{{ user.profile.location }}</p>
   </div>
 
   <div class="details">
       <h2 class="detail-name">Bio</h2>
-      <p class="detail-value">{{ current_user.profile.bio }}</p>
+      <p class="detail-value">{{ user.profile.bio }}</p>
   </div>
 
   <div class="details">
     <h2 class="detail-name">Project Header</h2>
-    <p class="detail-value">{{ current_user.profile.project_header }}</p>
+    <p class="detail-value">{{ user.profile.project_header }}</p>
   </div>
 
   <div class="details">
     <h2 class="detail-name">Article Header</h2>
-    <p class="detail-value">{{ current_user.profile.article_header }}</p>
+    <p class="detail-value">{{ user.profile.article_header }}</p>
   </div>
 
   <div class="details">
     <h2 class="detail-name">Work Header</h2>
-    <p class="detail-value">{{ current_user.profile.work_header }}</p>
+    <p class="detail-value">{{ user.profile.work_header }}</p>
   </div>
 
   <div class="details">
     <h2 class="detail-name">Resume</h2>
-    {% if current_user.profile.resume %}
-        <a class="normal-a" href="{{ url_for('serve_file', filename=current_user.profile.resume) }}" target="_blank">View</a>
+    {% if user.profile.resume %}
+        <a class="normal-a" href="{{ url_for('serve_file', filename=user.profile.resume) }}" target="_blank">View</a>
       {% else %}
         <span>No file available</span>
       {% endif %}
   </div>
 
   <div class="back-link">
-      <a href="{{ url_for('admin.edit_item', item='profiles', item_id=current_user.profile.id) }}">Edit</a>
+      <a href="{{ url_for('admin.edit_item', item='profiles', item_id=user.profile.id) }}">Edit</a>
   </div>
 </div>
 
 <div class="details-container small-br">
   <h1>Services</h1>
-  <a class="normal-a" href="{{ url_for('admin.create_item', parent='profiles', parent_id=current_user.profile.id, item='services') }}">Add Service</a>
+  <a class="normal-a" href="{{ url_for('admin.create_item', parent='profiles', parent_id=user.profile.id, item='services') }}">Add Service</a>
 
-  {% for service in current_user.profile.services %}
+  {% for service in user.profile.services %}
   <div class="items">
       <div>
         <h1>Service {{ loop.index }}</h1>
@@ -108,9 +108,9 @@
 
 <div class="details-container small-br">
   <h1>Contacts</h1>
-  <a class="normal-a" href="{{ url_for('admin.create_item', parent='profiles', parent_id=current_user.profile.id, item='contacts') }}">Add Contact</a>
+  <a class="normal-a" href="{{ url_for('admin.create_item', parent='profiles', parent_id=user.profile.id, item='contacts') }}">Add Contact</a>
 
-  {% for contact in current_user.profile.contacts %}
+  {% for contact in user.profile.contacts %}
   <div class="items">
       <div>
         <h1>Contact {{ loop.index }}</h1>

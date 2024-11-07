@@ -6,11 +6,12 @@ from models.article import Article
 from models.project import Project
 from models.work import Work
 from models.contribution import Contribution
+from flask_login import UserMixin
 from hashlib import md5
 import typing as t
 
 
-class User(BaseModel, db.Model):
+class User(UserMixin, BaseModel, db.Model):
     """
     Implement user model
     """

@@ -3,7 +3,7 @@
 {% block extra_css %}<link rel="stylesheet" href="{{ url_for('admin.static', filename='styles/dashboard.css') }}">{% endblock %}
 {% block content %}
 <div class="topbar">
-    <span style="font-weight: bold;">Welcome, {{ current_user.name.split(' ')[0] }}</span>
+    <span style="font-weight: bold;">Welcome, {{ user.name.split(' ')[0] }}</span>
 </div>
 
 <h1 style="margin-bottom: 50px;">Dashboard</h1>

@@ -14,10 +14,10 @@ from models.service import Service
 from models.work import Work
 from models.user_profile import UserProfile
 from app.api.v1.auth.auth import Auth
-from flask_jwt_extended import (
-    create_access_token,
-    set_access_cookies,
-    jwt_required
+from flask_login import (
+    login_user,
+    logout_user,
+    login_required
 )
 from flask import (
     render_template,
@@ -25,15 +25,22 @@ from flask import (
     request,
     redirect,
     url_for,
-    flash,
-    session,
-    make_response
+    flash
 )
 from flask.typing import ResponseReturnValue
 from app.admin.forms import LoginForm
+from app import login_manager
 
 user_auth = Auth()
 api_request = APIRequest('http://localhost:5000/v1')
+login_manager.login_view = 'admin.login'
+@login_manager.user_loader
+def load_user(user_id: str) -> User:
+    """
+    Load user
+    """
+    return db.fetch_object(User, id=user_id)
+
 model_map = {
     'articles': Article,
     'contacts': Contact,
@@ -65,7 +72,7 @@ def inject_user_profile():
     current_user['profile']['services'] = services
     current_user['profile']['contacts'] = contacts
 
-    return dict(current_user=current_user)
+    return dict(user=current_user)
 
 
 @admin.route('/', methods=['GET', 'POST'])
@@ -78,7 +85,7 @@ def login() -> ResponseReturnValue:
                 email=login_details['email'],
                 password=login_details['password']
             )
-        except Exception as err:
+        except Exception as _:
             abort(400)
 
         if validation_error:
@@ -93,11 +100,8 @@ def login() -> ResponseReturnValue:
             abort(400)
 
         if user:
-            access_token = create_access_token(identity=user.id)
-            response = make_response(redirect(url_for('admin.dashboard')))
-            set_access_cookies(response, access_token)
-
-            return response
+            login_user(user)
+            return redirect(url_for('admin.dashboard'))
 
         flash('password is incorrect', 'error')
         abort(400)
@@ -163,7 +167,7 @@ def reset_password() -> ResponseReturnValue:
 
 
 @admin.route('change-password', methods=['GET', 'POST'])
-@jwt_required(locations='cookies')
+@login_required
 def change_password() -> ResponseReturnValue:
     from app.admin.forms import ChangePasswordForm
 
@@ -187,7 +191,7 @@ def change_password() -> ResponseReturnValue:
 
 
 @admin.route('/edit-item/<string:item>/<string:item_id>', methods=['GET', 'POST'])
-@jwt_required(locations='cookies')
+@login_required
 def edit_item(item: str, item_id: str) -> ResponseReturnValue:
     import os
     from portfolio import app
@@ -294,7 +298,7 @@ def edit_item(item: str, item_id: str) -> ResponseReturnValue:
 
 
 @admin.route('/delete-item/<string:item>/<string:item_id>', methods=['GET'])
-@jwt_required(locations='cookies')
+@login_required
 def delete_item(item: str, item_id: str) -> ResponseReturnValue:
     if item not in [
         'contacts', 'gitrefs', 'articles', 'projects', 'services',
@@ -316,7 +320,7 @@ def delete_item(item: str, item_id: str) -> ResponseReturnValue:
 @admin.route(
     '/create-item/<string:parent>/<string:parent_id>/<string:item>',
     methods=['GET', 'POST'])
-@jwt_required(locations='cookies')
+@login_required
 def create_item(parent: str, parent_id: str, item: str) -> ResponseReturnValue:
     from app.admin.forms import forms
     from utils import handle_files
@@ -396,14 +400,14 @@ def create_item(parent: str, parent_id: str, item: str) -> ResponseReturnValue:
 
 
 @admin.route('/profile', methods=['GET'])
-@jwt_required(locations='cookies')
+@login_required
 def profile() -> ResponseReturnValue:
         return render_template('user_details.html')
 
 
 @admin.route('/view-item/<string:item>/<string:item_id>/<string:sub_item>', methods=['GET'])
 @admin.route('/view-item/<string:item>/<string:item_id>', methods=['GET'])
-@jwt_required(locations='cookies')
+@login_required
 def view_item(item: str, item_id: str, sub_item: str = None) -> ResponseReturnValue:
     from utils import encode_details
 
@@ -418,8 +422,9 @@ def view_item(item: str, item_id: str, sub_item: str = None) -> ResponseReturnVa
     if not parent_resource:
         abort(404)
 
-    title = parent_resource.pop('name') if parent_resource.get('name') else parent_resource.pop('title')
-    resource = encode_details(item, parent_resource)
+    p_resource = parent_resource.to_json()
+    title = p_resource.pop('name') if p_resource.get('name') else p_resource.pop('title')
+    resource = encode_details(item, p_resource)
     if sub_item:
         if sub_item == 'gitrefs':
             attr = 'git_refs'
@@ -449,9 +454,9 @@ def view_item(item: str, item_id: str, sub_item: str = None) -> ResponseReturnVa
 
 
 @admin.route('/dashboard', methods=['GET'])
-@jwt_required(locations='cookies')
+@login_required
 def dashboard() -> ResponseReturnValue:
-    from flask_jwt_extended import get_jwt_identity
+    from flask_login import current_user
 
     item_codes = {
         'projects': 'features',
@@ -461,7 +466,7 @@ def dashboard() -> ResponseReturnValue:
     }
 
     resource = {}
-    parent_resource = db.fetch_object(User, id=get_jwt_identity())
+    parent_resource = db.fetch_object(User, id=current_user.id)
     if not parent_resource:
         abort(404)
 
@@ -479,9 +484,9 @@ def dashboard() -> ResponseReturnValue:
 
 
 @admin.route('/fetch-items/<string:item>', methods=['GET'])
-@jwt_required(locations='cookies')
+@login_required
 def fetch_items(item: str) -> ResponseReturnValue:
-    from flask_jwt_extended import get_jwt_identity
+    from flask_login import current_user
 
     item_codes = {
         'projects': 'features',
@@ -493,7 +498,7 @@ def fetch_items(item: str) -> ResponseReturnValue:
     if item not in item_codes:
         abort(404)
 
-    parent_resource = db.fetch_object(User, id=get_jwt_identity())
+    parent_resource = db.fetch_object(User, id=current_user.id)
     if not parent_resource:
         abort(404)
 
@@ -511,14 +516,9 @@ def fetch_items(item: str) -> ResponseReturnValue:
 
 
 @admin.route('/logout', methods=['GET'])
-@jwt_required(locations='cookies')
+@login_required
 def logout() -> ResponseReturnValue:
-    from flask_jwt_extended import get_jwt
-    from models.invalid_token import InvalidToken
-
-    jti = get_jwt()['jti']
-    _ = db.add_object(InvalidToken, jti=jti)
-
+    logout_user()
     return redirect(url_for('admin.login'))
 
 

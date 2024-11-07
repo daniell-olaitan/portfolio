@@ -8,11 +8,13 @@ from flask_migrate import Migrate
 from flask_jwt_extended import JWTManager
 from flask_cors import CORS
 from models import db
+from flask_login import LoginManager
 from flask_mail import Mail
 
 jwt = JWTManager()
 mail = Mail()
 migrate = Migrate()
+login_manager = LoginManager()
 
 
 def create_app(config_type: str) -> Flask:
@@ -37,6 +39,7 @@ def create_app(config_type: str) -> Flask:
     jwt.init_app(app)
     mail.init_app(app)
     db.init_app(app)
+    login_manager.init_app(app)
     migrate.init_app(app, db)
     with app.app_context():
         db.create_all()
