@@ -274,7 +274,6 @@ class APINamespace:
                                 os.remove(file_path)
             resource = db.update_object(self.resource_type, resource_id, **details)
         except Exception as err:
-            print(err)
             return jsonify({
                 'status': 'fail',
                 'data': {
@@ -303,7 +302,6 @@ class APINamespace:
             try:
                 db.remove_object(self.resource_type, resource_id)
             except Exception as err:
-                print(err)
                 return jsonify({
                     'status': 'fail',
                     'data': {

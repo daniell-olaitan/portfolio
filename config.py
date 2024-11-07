@@ -9,6 +9,7 @@ class Config:
     JWT_SECRET_KEY = getenv('JWT_SECRET_KEY')
     JWT_BLACKLIST_ENABLED = True
     JWT_BLACKLIST_TOKEN_CHECKS = ['access']
+    JWT_TOKEN_LOCATION = ['cookies']
     GOOGLE_CLIENT_ID = getenv("GOOGLE_CLIENT_ID", None)
     GOOGLE_CLIENT_SECRET = getenv("GOOGLE_CLIENT_SECRET", None)
     GOOGLE_REDIRECT_URI = 'https://127.0.0.1:5000/v1/auth/login-callback'

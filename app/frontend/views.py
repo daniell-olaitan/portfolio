@@ -5,7 +5,6 @@ from app.frontend import frontend
 from flask.typing import ResponseReturnValue
 from flask import (
     url_for,
-    redirect,
     render_template
 )
 
