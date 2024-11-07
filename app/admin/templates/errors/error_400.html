@@ -1,0 +1,9 @@
+{% extends "base.html" %}
+{% block title %}Bad Request | Portfolio{% endblock %}
+{% block extra_css %}<link rel="stylesheet" href="{{ url_for('admin.static', filename='styles/dashboard.css') }}">{% endblock %}
+{% block content %}
+<h2>400 - Bad Request</h2>
+<p>Oops! It seems there is an error in the request.</p>
+<p><a class="normal-a" href="{{ url_for('admin.dashboard') }}">Go to Dashboard</a></p>
+{% endblock %}
+
