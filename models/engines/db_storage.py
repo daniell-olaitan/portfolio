@@ -2,6 +2,7 @@
 from flask_sqlalchemy import SQLAlchemy
 import typing as t
 from sqlalchemy.exc import IntegrityError
+from sqlalchemy import desc
 
 ModelType = t.TypeVar('Model')
 
@@ -61,13 +62,13 @@ class DBStorage(SQLAlchemy):
         """
         Fetch object(s) from the database using attributes
         """
-        return self.session.query(cls).filter_by(**kwargs).all()
+        return self.session.query(cls).filter_by(**kwargs).order_by(desc(cls.created_at)).all()
 
     def fetch_all(self, cls: t.Type[ModelType]) -> t.List[ModelType]:
         """
         Fetch all the objects of type cls from the database
         """
-        return self.session.query(cls).all()
+        return self.session.query(cls).order_by(desc(cls.created_at)).all()
 
     def update_object(
         self,
