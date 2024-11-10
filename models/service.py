@@ -10,5 +10,5 @@ class Service(BaseModel, db.Model):
         db.ForeignKey('user_profiles.id'),
         nullable=False
     )
-    title = db.Column(db.String(20), nullable=False)
+    title = db.Column(db.String(60), nullable=False)
     description = db.Column(db.Text, nullable=False)
