@@ -97,6 +97,15 @@
             {% endfor %}
             </ul>
           </div>
+          {% if contribution.repo_url %}
+            <a
+              href="{{ contribution.repo_url }}"
+              class="w-max-content hover:opacity-50 bg-blue-500 text-white font-semibold py-3 px-5 rounded"
+              target="_blank"
+            >
+              Github Repo
+            </a>
+          {% endif %}
         </li>
       {% endfor %}
     {% else %}

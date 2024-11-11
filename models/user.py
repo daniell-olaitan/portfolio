@@ -9,6 +9,7 @@ from models.contribution import Contribution
 from flask_login import UserMixin
 from hashlib import md5
 import typing as t
+from sqlalchemy import desc
 
 
 class User(UserMixin, BaseModel, db.Model):
@@ -31,7 +32,8 @@ class User(UserMixin, BaseModel, db.Model):
         'Project',
         backref='user',
         cascade='all, delete-orphan',
-        lazy='dynamic'
+        lazy='dynamic',
+        order_by=desc(Project.created_at)
     )
 
     works = db.relationship(

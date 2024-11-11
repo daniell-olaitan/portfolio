@@ -86,6 +86,7 @@ def get_projects() -> ResponseReturnValue:
     projects = []
     for project in user.projects:
         features = [feature.to_json() for feature in project.features]
+        print(project.title)
         project = project.to_json()
         project['features'] = features
         projects.append(project)
